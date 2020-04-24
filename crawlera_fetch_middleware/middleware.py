@@ -6,10 +6,10 @@ from scrapy.responsetypes import responsetypes
 from w3lib.http import basic_auth_header
 
 
-logger = logging.getLogger("scrapy-crawlera")
+logger = logging.getLogger("crawlera-fetch-middleware")
 
 
-class CrawleraFetchMiddleware:
+class CrawleraFetchMiddleware(object):
 
     url = "https://api.crawlera.com/fetch/v2"
     apikey = ""

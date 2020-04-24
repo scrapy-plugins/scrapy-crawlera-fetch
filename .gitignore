@@ -8,3 +8,4 @@
 htmlcov/
 coverage.xml
 examples/
+pip-wheel-metadata/
