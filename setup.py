@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 
 setuptools.setup(
-    name="scrapy_simple_fetch_middleware",
+    name="scrapy-crawlera-fetch-middleware",
     version="0.0.1",
     license="BSD",
     description="Scrapy downloader middleware to interact with Crawlera Simple Fetch API",
@@ -14,7 +14,7 @@ setuptools.setup(
     author="Scrapinghub",
     author_email="info@scrapinghub.com",
     url="https://github.com/scrapinghub/scrapy-uncork",
-    packages=["simple_fetch_middleware"],
+    packages=["crawlera_fetch_middleware"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "License :: OSI Approved :: BSD License",

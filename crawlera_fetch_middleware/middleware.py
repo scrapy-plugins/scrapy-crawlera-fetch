@@ -9,7 +9,7 @@ from w3lib.http import basic_auth_header
 logger = logging.getLogger("scrapy-crawlera")
 
 
-class CrawleraSimpleFetchMiddleware:
+class CrawleraFetchMiddleware:
 
     url = "https://api.crawlera.com/fetch/v2"
     apikey = ""

@@ -1,7 +1,7 @@
 from scrapy import Spider, Request
 from scrapy.utils.test import get_crawler
 
-from simple_fetch_middleware import CrawleraSimpleFetchMiddleware
+from crawlera_fetch_middleware import CrawleraFetchMiddleware
 
 from tests.data.responses import test_responses
 
@@ -14,7 +14,7 @@ SETTINGS = {
 
 
 def test_process_request():
-    middleware = CrawleraSimpleFetchMiddleware(get_crawler(settings_dict=SETTINGS))
+    middleware = CrawleraFetchMiddleware(get_crawler(settings_dict=SETTINGS))
 
     for case in test_responses:
         original = case["original"]

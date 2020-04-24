@@ -1,10 +1,10 @@
 .PHONY: lint black clean
 
 lint:
-	@python -m flake8 --exclude=.git,venv* simple_fetch_middleware tests
+	@python -m flake8 --exclude=.git,venv* crawlera_fetch_middleware tests
 
 black:
-	@black --check simple_fetch_middleware tests
+	@black --check crawlera_fetch_middleware tests
 
 clean:
 	@find . -name "*.pyc" -delete
