@@ -29,4 +29,5 @@ setuptools.setup(
         "Topic :: Software Development :: Libraries :: Application Frameworks",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
+    install_requires=["scrapy>=1.5.0", "w3lib"],
 )
