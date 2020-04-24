@@ -22,8 +22,13 @@ test_requests.append(
         "expected": Request(
             url="https://example.org",
             method="POST",
-            headers={"Authorization": ["Basic MTIzNDU6"], "Content-Type": ["application/json"]},
+            headers={
+                "Authorization": ["Basic MTIzNDU6"],
+                "Content-Type": ["application/json"],
+                "Accept": ["application/json"],
+            },
             meta={
+                "crawlera_processed": True,
                 "crawlera": {
                     "render": "no",
                     "region": "us",
@@ -56,8 +61,12 @@ test_requests.append(
         "expected": FormRequest(
             url="https://example.org",
             method="POST",
-            headers={"Authorization": ["Basic MTIzNDU6"], "Content-Type": ["application/json"]},
-            meta={"crawlera": {"device": "desktop"}},
+            headers={
+                "Authorization": ["Basic MTIzNDU6"],
+                "Content-Type": ["application/json"],
+                "Accept": ["application/json"],
+            },
+            meta={"crawlera_processed": True, "crawlera": {"device": "desktop"}},
             body=json.dumps(
                 {
                     "url": "https://httpbin.org/post",
