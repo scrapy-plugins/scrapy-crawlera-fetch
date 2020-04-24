@@ -1,6 +1,9 @@
 import json
 
 from scrapy import Request, FormRequest
+from w3lib.http import basic_auth_header
+
+from tests.data import SETTINGS
 
 
 test_requests = []
@@ -20,12 +23,12 @@ test_requests.append(
             },
         ),
         "expected": Request(
-            url="https://example.org",
+            url=SETTINGS["CRAWLERA_URL"],
             method="POST",
             headers={
-                "Authorization": ["Basic MTIzNDU6"],
-                "Content-Type": ["application/json"],
-                "Accept": ["application/json"],
+                "Authorization": basic_auth_header(SETTINGS["CRAWLERA_APIKEY"], ""),
+                "Content-Type": "application/json",
+                "Accept": "application/json",
             },
             meta={
                 "crawlera_processed": True,
@@ -59,12 +62,12 @@ test_requests.append(
             formdata={"foo": "bar"},
         ),
         "expected": FormRequest(
-            url="https://example.org",
+            url=SETTINGS["CRAWLERA_URL"],
             method="POST",
             headers={
-                "Authorization": ["Basic MTIzNDU6"],
-                "Content-Type": ["application/json"],
-                "Accept": ["application/json"],
+                "Authorization": basic_auth_header(SETTINGS["CRAWLERA_APIKEY"], ""),
+                "Content-Type": "application/json",
+                "Accept": "application/json",
             },
             meta={"crawlera_processed": True, "crawlera": {"device": "desktop"}},
             body=json.dumps(

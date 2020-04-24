@@ -3,14 +3,8 @@ from scrapy.utils.test import get_crawler
 
 from crawlera_fetch_middleware import CrawleraFetchMiddleware
 
+from tests.data import SETTINGS
 from tests.data.responses import test_responses
-
-
-SETTINGS = {
-    "CRAWLERA_ENABLED": True,
-    "CRAWLERA_URL": "https://example.org",
-    "CRAWLERA_APIKEY": "12345",
-}
 
 
 def test_process_request():

@@ -1,13 +1,15 @@
 from scrapy.http.response.html import HtmlResponse
 from scrapy.http.response.text import TextResponse
 
+from tests.data import SETTINGS
+
 
 test_responses = []
 
 test_responses.append(
     {
         "original": HtmlResponse(
-            url="https://api.crawlera.com/fetch/v2",
+            url=SETTINGS["CRAWLERA_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
@@ -31,7 +33,7 @@ test_responses.append(
 test_responses.append(
     {
         "original": HtmlResponse(
-            url="https://api.crawlera.com/fetch/v2",
+            url=SETTINGS["CRAWLERA_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
@@ -65,7 +67,7 @@ test_responses.append(
 test_responses.append(
     {
         "original": HtmlResponse(
-            url="https://api.crawlera.com/fetch/v2",
+            url=SETTINGS["CRAWLERA_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
