@@ -8,7 +8,7 @@ from tests.data.responses import test_responses
 
 
 def test_process_request():
-    middleware = CrawleraFetchMiddleware(get_crawler(settings_dict=SETTINGS))
+    middleware = CrawleraFetchMiddleware.from_crawler(get_crawler(settings_dict=SETTINGS))
 
     for case in test_responses:
         original = case["original"]

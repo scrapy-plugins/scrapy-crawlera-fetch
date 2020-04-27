@@ -11,7 +11,7 @@ from tests.data.requests import test_requests
 
 
 def test_process_request():
-    middleware = CrawleraFetchMiddleware(get_crawler(settings_dict=SETTINGS))
+    middleware = CrawleraFetchMiddleware.from_crawler(get_crawler(settings_dict=SETTINGS))
 
     for case in deepcopy(test_requests):
         original = case["original"]
