@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 
 setuptools.setup(
-    name="scrapy-crawlera-fetch-middleware",
+    name="scrapy-crawlera-fetch",
     version="0.0.1",
     license="BSD",
     description="Scrapy downloader middleware to interact with Crawlera Simple Fetch API",
