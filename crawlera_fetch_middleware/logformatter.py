@@ -13,7 +13,7 @@ class CrawleraFetchLogFormatter(LogFormatter):
         DEBUG: Crawled (200) <POST https://api.crawlera.com/fetch/v2> (referer: None)
 
     this formatter shows:
-        DEBUG: Crawled (200) <POST https://example.org> (referer: None)
+        DEBUG: Crawled (200) <GET https://example.org> (referer: None)
     """
 
     def _set_target_url(self, result, request):
