@@ -1,7 +1,7 @@
 # Scrapy Middleware for Crawlera Simple Fetch API
 
 This package provides a Scrapy [Downloader Middleware](https://docs.scrapy.org/en/latest/topics/downloader-middleware.html)
-to transparently interact with the [Cralera Fetch API](https://scrapinghub.atlassian.net/wiki/spaces/CRAWLERA/pages/889979197/Simple+Fetch+API).
+to transparently interact with the [Crawlera Fetch API](https://scrapinghub.atlassian.net/wiki/spaces/CRAWLERA/pages/889979197/Simple+Fetch+API).
 
 
 ## Installation
