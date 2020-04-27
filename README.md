@@ -16,7 +16,7 @@ setting:
 
 ```
 DOWNLOADER_MIDDLEWARES = {
-    "crawlera_fetch_middleware.CrawleraFetchMiddleware": 585,
+    "crawlera_fetch.CrawleraFetchMiddleware": 585,
 }
 ```
 
@@ -42,7 +42,7 @@ log formatter by overriding the [`LOG_FORMATTER`](https://docs.scrapy.org/en/lat
 setting:
 
 ```
-LOG_FORMATTER = "crawlera_fetch_middleware.CrawleraFetchLogFormatter"
+LOG_FORMATTER = "crawlera_fetch.CrawleraFetchLogFormatter"
 ```
 
 Note that the ability to override the error messages for spider and download errors was added

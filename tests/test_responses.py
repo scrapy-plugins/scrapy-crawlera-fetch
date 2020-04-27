@@ -1,7 +1,7 @@
 from scrapy import Spider, Request
 from scrapy.utils.test import get_crawler
 
-from crawlera_fetch_middleware import CrawleraFetchMiddleware
+from crawlera_fetch import CrawleraFetchMiddleware
 
 from tests.data import SETTINGS
 from tests.data.responses import test_responses

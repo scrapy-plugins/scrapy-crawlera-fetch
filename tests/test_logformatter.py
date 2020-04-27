@@ -7,8 +7,8 @@ from scrapy.http.response import Response
 from scrapy.utils.test import get_crawler
 from twisted.python.failure import Failure
 
-from crawlera_fetch_middleware.logformatter import CrawleraFetchLogFormatter
-from crawlera_fetch_middleware.middleware import CrawleraFetchMiddleware
+from crawlera_fetch.logformatter import CrawleraFetchLogFormatter
+from crawlera_fetch.middleware import CrawleraFetchMiddleware
 
 from tests.data import SETTINGS
 from tests.data.requests import test_requests

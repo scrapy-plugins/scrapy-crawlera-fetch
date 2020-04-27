@@ -2,7 +2,7 @@ import pytest
 from scrapy.exceptions import NotConfigured
 from scrapy.utils.test import get_crawler
 
-from crawlera_fetch_middleware import CrawleraFetchMiddleware
+from crawlera_fetch import CrawleraFetchMiddleware
 
 from tests.data import SETTINGS
 

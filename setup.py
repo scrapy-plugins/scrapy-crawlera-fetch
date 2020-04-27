@@ -14,7 +14,7 @@ setuptools.setup(
     author="Scrapinghub",
     author_email="info@scrapinghub.com",
     url="https://github.com/scrapinghub/scrapy-uncork",
-    packages=["crawlera_fetch_middleware"],
+    packages=["crawlera_fetch"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "License :: OSI Approved :: BSD License",

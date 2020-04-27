@@ -4,7 +4,7 @@ from copy import deepcopy
 from scrapy import Spider
 from scrapy.utils.test import get_crawler
 
-from crawlera_fetch_middleware import CrawleraFetchMiddleware
+from crawlera_fetch import CrawleraFetchMiddleware
 
 from tests.data import SETTINGS
 from tests.data.requests import test_requests
