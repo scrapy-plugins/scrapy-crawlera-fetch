@@ -1,13 +1,12 @@
 import json
+from contextlib import suppress
+from typing import Optional
 
+from scrapy.http.request import Request
+from scrapy.http.response import Response
 from scrapy.logformatter import LogFormatter
-
-
-# py2 compatibility
-try:
-    JSONDecodeError = json.decoder.JSONDecodeError
-except AttributeError:
-    JSONDecodeError = ValueError
+from scrapy.spiders import Spider
+from twisted.python.failure import Failure
 
 
 class CrawleraFetchLogFormatter(LogFormatter):
@@ -23,21 +22,21 @@ class CrawleraFetchLogFormatter(LogFormatter):
         DEBUG: Crawled (200) <GET https://example.org> (referer: None)
     """
 
-    def _set_target_url(self, result, request):
-        try:
+    def _set_target_url(self, result: dict, request: Request) -> dict:
+        with suppress(json.decoder.JSONDecodeError):
             payload = json.loads(request.body.decode(request.encoding))
             result["args"]["request"] = "<%s %s>" % (payload["method"], payload["url"])
-        except JSONDecodeError:
-            pass
         return result
 
-    def crawled(self, request, response, spider):
+    def crawled(self, request: Request, response: Response, spider: Spider) -> dict:
         return self._set_target_url(
             result=super(CrawleraFetchLogFormatter, self).crawled(request, response, spider),
             request=request,
         )
 
-    def spider_error(self, failure, request, response, spider):
+    def spider_error(
+        self, failure: Failure, request: Request, response: Response, spider: Spider
+    ) -> dict:
         """
         Only available in Scrapy 2.0+
         """
@@ -48,7 +47,9 @@ class CrawleraFetchLogFormatter(LogFormatter):
             request=request,
         )
 
-    def download_error(self, failure, request, spider, errmsg=None):
+    def download_error(
+        self, failure: Failure, request: Request, spider: Spider, errmsg: Optional[str] = None
+    ) -> dict:
         """
         Only available in Scrapy 2.0+
         """
