@@ -1,6 +1,7 @@
 import json
 import logging
 
+from scrapy import version_info as scrapy_version
 from scrapy.exceptions import NotConfigured
 from scrapy.responsetypes import responsetypes
 from w3lib.http import basic_auth_header
@@ -50,6 +51,9 @@ class CrawleraFetchMiddleware(object):
                 "Accept": "application/json",
             }
         )
+
+        if scrapy_version < (2, 0, 0):
+            request.flags.append("Original URL: {}".format(request.url))
 
         return request.replace(
             url=self.url, method="POST", headers=headers, body=json.dumps(body),

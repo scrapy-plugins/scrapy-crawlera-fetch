@@ -44,3 +44,7 @@ setting:
 ```
 LOG_FORMATTER = "crawlera_fetch_middleware.CrawleraFetchLogFormatter"
 ```
+
+Note that the ability to override the error messages for spider and download errors was added
+in Scrapy 2.0. When using a previous version, the middleware will add the original request URL
+to the `Request.flags` attribute, which is shown in the logs by default.

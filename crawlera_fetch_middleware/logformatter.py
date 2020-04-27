@@ -3,6 +3,13 @@ import json
 from scrapy.logformatter import LogFormatter
 
 
+# py2 compatibility
+try:
+    JSONDecodeError = json.decoder.JSONDecodeError
+except AttributeError:
+    JSONDecodeError = ValueError
+
+
 class CrawleraFetchLogFormatter(LogFormatter):
     """
     Since the CrawleraFetchMiddleware sets a new URL for outgoing requests, by
@@ -17,8 +24,11 @@ class CrawleraFetchLogFormatter(LogFormatter):
     """
 
     def _set_target_url(self, result, request):
-        payload = json.loads(request.body.decode(request.encoding))
-        result["args"]["request"] = "<%s %s>" % (payload["method"], payload["url"])
+        try:
+            payload = json.loads(request.body.decode(request.encoding))
+            result["args"]["request"] = "<%s %s>" % (payload["method"], payload["url"])
+        except JSONDecodeError:
+            pass
         return result
 
     def crawled(self, request, response, spider):
@@ -28,6 +38,9 @@ class CrawleraFetchLogFormatter(LogFormatter):
         )
 
     def spider_error(self, failure, request, response, spider):
+        """
+        Only available in Scrapy 2.0+
+        """
         return self._set_target_url(
             result=super(CrawleraFetchLogFormatter, self).spider_error(
                 failure, request, response, spider
@@ -36,6 +49,9 @@ class CrawleraFetchLogFormatter(LogFormatter):
         )
 
     def download_error(self, failure, request, spider, errmsg=None):
+        """
+        Only available in Scrapy 2.0+
+        """
         return self._set_target_url(
             result=super(CrawleraFetchLogFormatter, self).download_error(
                 failure, request, spider, errmsg
