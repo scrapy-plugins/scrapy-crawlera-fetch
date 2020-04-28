@@ -48,10 +48,10 @@ class CrawleraFetchMiddleware:
             return None
         request.meta["crawlera_fetch_processed"] = True
 
-        crawlera_meta = request.meta.get("crawlera") or {}
+        crawlera_args = request.meta.get("crawlera_fetch") or {}
         original_body_text = request.body.decode(request.encoding)
         body = {"url": request.url, "method": request.method, "body": original_body_text}
-        body.update(crawlera_meta)
+        body.update(crawlera_args)
 
         headers = request.headers
         headers.update(

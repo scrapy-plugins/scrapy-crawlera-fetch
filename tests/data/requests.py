@@ -14,7 +14,7 @@ test_requests.append(
             url="https://httpbin.org/anything",
             method="GET",
             meta={
-                "crawlera": {
+                "crawlera_fetch": {
                     "render": "no",
                     "region": "us",
                     "iptype": "datacenter",
@@ -32,7 +32,7 @@ test_requests.append(
             },
             meta={
                 "crawlera_fetch_processed": True,
-                "crawlera": {
+                "crawlera_fetch": {
                     "render": "no",
                     "region": "us",
                     "iptype": "datacenter",
@@ -58,7 +58,7 @@ test_requests.append(
     {
         "original": FormRequest(
             url="https://httpbin.org/post",
-            meta={"crawlera": {"device": "desktop"}},
+            meta={"crawlera_fetch": {"device": "desktop"}},
             formdata={"foo": "bar"},
         ),
         "expected": FormRequest(
@@ -69,7 +69,7 @@ test_requests.append(
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
-            meta={"crawlera_fetch_processed": True, "crawlera": {"device": "desktop"}},
+            meta={"crawlera_fetch_processed": True, "crawlera_fetch": {"device": "desktop"}},
             body=json.dumps(
                 {
                     "url": "https://httpbin.org/post",
