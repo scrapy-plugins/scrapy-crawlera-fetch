@@ -1,21 +1,29 @@
 import json
 import logging
+from typing import Optional, Type, TypeVar
 
 from scrapy import version_info as scrapy_version
+from scrapy.crawler import Crawler
 from scrapy.exceptions import NotConfigured
+from scrapy.http.request import Request
+from scrapy.http.response import Response
 from scrapy.responsetypes import responsetypes
+from scrapy.spiders import Spider
 from w3lib.http import basic_auth_header
 
 
 logger = logging.getLogger("crawlera-fetch-middleware")
 
 
-class CrawleraFetchMiddleware(object):
+MiddlewareTypeVar = TypeVar("MiddlewareTypeVar", bound="CrawleraFetchMiddleware")
+
+
+class CrawleraFetchMiddleware:
 
     url = "https://api.crawlera.com/fetch/v2"
     apikey = ""
 
-    def __init__(self, crawler):
+    def __init__(self, crawler: Crawler) -> None:
         if not crawler.settings.getbool("CRAWLERA_ENABLED"):
             raise NotConfigured()
         elif not crawler.settings.get("CRAWLERA_APIKEY"):
@@ -30,10 +38,10 @@ class CrawleraFetchMiddleware(object):
         logger.debug("Using Crawlera at %s with apikey %s***" % (self.url, self.apikey[:5]))
 
     @classmethod
-    def from_crawler(cls, crawler):
+    def from_crawler(cls: Type[MiddlewareTypeVar], crawler: Crawler) -> MiddlewareTypeVar:
         return cls(crawler)
 
-    def process_request(self, request, spider):
+    def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
         if request.meta.get("crawlera_processed"):
             return None
         request.meta["crawlera_processed"] = True
@@ -59,7 +67,7 @@ class CrawleraFetchMiddleware(object):
             url=self.url, method="POST", headers=headers, body=json.dumps(body),
         )
 
-    def process_response(self, request, response, spider):
+    def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
         request.meta.pop("crawlera_processed", None)
         json_response = json.loads(response.text)
         request.meta["crawlera_response"] = {
