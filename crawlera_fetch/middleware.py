@@ -44,30 +44,27 @@ class CrawleraFetchMiddleware:
         return cls(crawler)
 
     def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
-        if request.meta.get("crawlera_fetch_processed") or request.meta.get("crawlera_fetch_skip"):
+        if request.meta.get("crawlera_fetch_skip") or request.meta.get("crawlera_fetch_processed"):
             return None
-        request.meta["crawlera_fetch_processed"] = True
 
-        crawlera_args = request.meta.get("crawlera_fetch") or {}
+        # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
         body = {"url": request.url, "method": request.method, "body": original_body_text}
-        body.update(crawlera_args)
+        body.update(request.meta.get("crawlera_fetch") or {})
+        body_json = json.dumps(body)
 
-        headers = request.headers
-        headers.update(
-            {
-                "Authorization": self.auth_header,
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            }
-        )
+        headers = {
+            "Authorization": self.auth_header,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        request.headers.update(headers)
 
         if scrapy_version < (2, 0, 0):
             request.flags.append("Original URL: {}".format(request.url))
 
-        return request.replace(
-            url=self.url, method="POST", headers=headers, body=json.dumps(body),
-        )
+        request.meta["crawlera_fetch_processed"] = True
+        return request.replace(url=self.url, method="POST", body=body_json)
 
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
         if request.meta.get("crawlera_fetch_skip"):
