@@ -9,7 +9,7 @@ test_responses = []
 test_responses.append(
     {
         "original": HtmlResponse(
-            url=SETTINGS["CRAWLERA_URL"],
+            url=SETTINGS["CRAWLERA_FETCH_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
@@ -33,7 +33,7 @@ test_responses.append(
 test_responses.append(
     {
         "original": HtmlResponse(
-            url=SETTINGS["CRAWLERA_URL"],
+            url=SETTINGS["CRAWLERA_FETCH_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
@@ -67,7 +67,7 @@ test_responses.append(
 test_responses.append(
     {
         "original": HtmlResponse(
-            url=SETTINGS["CRAWLERA_URL"],
+            url=SETTINGS["CRAWLERA_FETCH_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",

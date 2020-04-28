@@ -15,7 +15,7 @@ def test_process_request():
         expected = case["expected"]
 
         processed = middleware.process_response(
-            request=Request(SETTINGS["CRAWLERA_URL"]), response=original, spider=Spider("foo")
+            Request(SETTINGS["CRAWLERA_FETCH_URL"]), original, Spider("foo")
         )
 
         assert type(processed) is type(expected)

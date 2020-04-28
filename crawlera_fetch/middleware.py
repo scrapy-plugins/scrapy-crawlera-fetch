@@ -24,16 +24,16 @@ class CrawleraFetchMiddleware:
     apikey = ""
 
     def __init__(self, crawler: Crawler) -> None:
-        if not crawler.settings.getbool("CRAWLERA_ENABLED"):
+        if not crawler.settings.getbool("CRAWLERA_FETCH_ENABLED"):
             raise NotConfigured()
-        elif not crawler.settings.get("CRAWLERA_APIKEY"):
+        elif not crawler.settings.get("CRAWLERA_FETCH_APIKEY"):
             raise NotConfigured("Crawlera cannot be used without an apikey")
         else:
-            self.apikey = crawler.settings["CRAWLERA_APIKEY"]
+            self.apikey = crawler.settings["CRAWLERA_FETCH_APIKEY"]
             self.auth_header = basic_auth_header(self.apikey, "")
 
-        if crawler.settings.get("CRAWLERA_URL"):
-            self.url = crawler.settings["CRAWLERA_URL"]
+        if crawler.settings.get("CRAWLERA_FETCH_URL"):
+            self.url = crawler.settings["CRAWLERA_FETCH_URL"]
 
         logger.debug("Using Crawlera at %s with apikey %s***" % (self.url, self.apikey[:5]))
 

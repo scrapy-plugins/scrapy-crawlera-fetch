@@ -26,11 +26,11 @@ Crawlera middleware won't be able to handle them.
 
 #### Settings
 
-* `CRAWLERA_ENABLED` - Whether or not the middleware will be enabled,
-    i.e. requests should be downloaded using Crawlera
-* `CRAWLERA_APIKEY` - API key to be used to authenticate against the Crawlera endpoint
+* `CRAWLERA_FETCH_ENABLED` - Whether or not the middleware will be enabled,
+    i.e. requests should be downloaded using the Crawlera Fetch API
+* `CRAWLERA_FETCH_APIKEY` - API key to be used to authenticate against the Crawlera endpoint
     (mandatory if enabled)
-* `CRAWLERA_URL` - The endpoint of a specific Crawlera instance,
+* `CRAWLERA_FETCH_URL` - The endpoint of a specific Crawlera instance,
     defaults to https://api.crawlera.com/fetch/v2
 
 

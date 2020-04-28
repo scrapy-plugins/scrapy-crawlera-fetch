@@ -23,10 +23,10 @@ test_requests.append(
             },
         ),
         "expected": Request(
-            url=SETTINGS["CRAWLERA_URL"],
+            url=SETTINGS["CRAWLERA_FETCH_URL"],
             method="POST",
             headers={
-                "Authorization": basic_auth_header(SETTINGS["CRAWLERA_APIKEY"], ""),
+                "Authorization": basic_auth_header(SETTINGS["CRAWLERA_FETCH_APIKEY"], ""),
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
@@ -62,10 +62,10 @@ test_requests.append(
             formdata={"foo": "bar"},
         ),
         "expected": FormRequest(
-            url=SETTINGS["CRAWLERA_URL"],
+            url=SETTINGS["CRAWLERA_FETCH_URL"],
             method="POST",
             headers={
-                "Authorization": basic_auth_header(SETTINGS["CRAWLERA_APIKEY"], ""),
+                "Authorization": basic_auth_header(SETTINGS["CRAWLERA_FETCH_APIKEY"], ""),
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
