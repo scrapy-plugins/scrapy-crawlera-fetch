@@ -72,7 +72,7 @@ Request(url="<Crawlera Fetch API endpoint>", method="POST",
 
 ### Additional arguments
 
-Additional arguments could be specified under the `crawlera_fetch` Request.meta key. For instance:
+Additional arguments could be specified under the `crawlera_fetch` `Request.meta` key. For instance:
 
 ```python
 Request(
@@ -87,6 +87,10 @@ is translated into the following body:
 '{"url": "https://example.org", "method": "GET", "body": "", "region": "us", "device": "mobile"}'
 ```
 
+### Accessing raw Crawlera responses
+
+The `status`, `headers` and `body` attributes of the upstream Crawlera response are available under
+the `crawlera_fetch_response` `Response.meta` key.
 
 ### Skipping requests
 

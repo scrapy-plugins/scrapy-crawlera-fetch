@@ -75,7 +75,7 @@ class CrawleraFetchMiddleware:
 
         request.meta.pop("crawlera_fetch_processed", None)
         json_response = json.loads(response.text)
-        request.meta["crawlera_response"] = {
+        request.meta["crawlera_fetch_response"] = {
             "status": response.status,
             "headers": response.headers,
             "body": json_response,
