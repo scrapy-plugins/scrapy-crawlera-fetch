@@ -31,7 +31,7 @@ test_requests.append(
                 "Accept": "application/json",
             },
             meta={
-                "crawlera_processed": True,
+                "crawlera_fetch_processed": True,
                 "crawlera": {
                     "render": "no",
                     "region": "us",
@@ -69,7 +69,7 @@ test_requests.append(
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
-            meta={"crawlera_processed": True, "crawlera": {"device": "desktop"}},
+            meta={"crawlera_fetch_processed": True, "crawlera": {"device": "desktop"}},
             body=json.dumps(
                 {
                     "url": "https://httpbin.org/post",
@@ -79,5 +79,14 @@ test_requests.append(
                 }
             ),
         ),
+    }
+)
+
+test_requests.append(
+    {
+        "original": Request(
+            url="https://example.org", method="HEAD", meta={"crawlera_fetch_skip": True},
+        ),
+        "expected": None,
     }
 )

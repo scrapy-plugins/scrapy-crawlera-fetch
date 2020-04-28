@@ -27,7 +27,7 @@ class CrawleraFetchMiddleware:
         if not crawler.settings.getbool("CRAWLERA_FETCH_ENABLED"):
             raise NotConfigured()
         elif not crawler.settings.get("CRAWLERA_FETCH_APIKEY"):
-            raise NotConfigured("Crawlera cannot be used without an apikey")
+            raise NotConfigured("Crawlera Fetch API cannot be used without an apikey")
         else:
             self.apikey = crawler.settings["CRAWLERA_FETCH_APIKEY"]
             self.auth_header = basic_auth_header(self.apikey, "")
@@ -35,16 +35,18 @@ class CrawleraFetchMiddleware:
         if crawler.settings.get("CRAWLERA_FETCH_URL"):
             self.url = crawler.settings["CRAWLERA_FETCH_URL"]
 
-        logger.debug("Using Crawlera at %s with apikey %s***" % (self.url, self.apikey[:5]))
+        logger.debug(
+            "Using Crawlera Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
+        )
 
     @classmethod
     def from_crawler(cls: Type[MiddlewareTypeVar], crawler: Crawler) -> MiddlewareTypeVar:
         return cls(crawler)
 
     def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
-        if request.meta.get("crawlera_processed"):
+        if request.meta.get("crawlera_fetch_processed") or request.meta.get("crawlera_fetch_skip"):
             return None
-        request.meta["crawlera_processed"] = True
+        request.meta["crawlera_fetch_processed"] = True
 
         crawlera_meta = request.meta.get("crawlera") or {}
         original_body_text = request.body.decode(request.encoding)
@@ -68,7 +70,10 @@ class CrawleraFetchMiddleware:
         )
 
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
-        request.meta.pop("crawlera_processed", None)
+        if request.meta.get("crawlera_fetch_skip"):
+            return response
+
+        request.meta.pop("crawlera_fetch_processed", None)
         json_response = json.loads(response.text)
         request.meta["crawlera_response"] = {
             "status": response.status,

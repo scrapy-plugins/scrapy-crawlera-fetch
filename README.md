@@ -24,7 +24,7 @@ Please note that the middleware needs to be placed before the built-in `HttpComp
 middleware (which has a priority of 590) , otherwise incoming responses will be compressed and the
 Crawlera middleware won't be able to handle them.
 
-#### Settings
+### Settings
 
 * `CRAWLERA_FETCH_ENABLED` - Whether or not the middleware will be enabled,
     i.e. requests should be downloaded using the Crawlera Fetch API
@@ -33,8 +33,13 @@ Crawlera middleware won't be able to handle them.
 * `CRAWLERA_FETCH_URL` - The endpoint of a specific Crawlera instance,
     defaults to https://api.crawlera.com/fetch/v2
 
+### Skipping requests
 
-#### Log formatter
+You can instruct the middleware to skip a specific request by setting the `crawlera_fetch_skip`
+[Request.meta](https://docs.scrapy.org/en/latest/topics/request-response.html#scrapy.http.Request.meta)
+key.
+
+### Log formatter
 
 Since the URL for outgoing requests is modified by the middleware, by default the logs will show
 the URL for the Crawlera endpoint. To revert this behaviour you can enable the provided

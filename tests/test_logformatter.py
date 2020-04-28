@@ -26,6 +26,10 @@ def test_log_formatter_scrapy_1():
         response = Response(original.url)
         processed = middleware.process_request(original, spider)
 
+        if original.meta.get("crawlera_fetch_skip"):
+            assert processed is None
+            continue
+
         # crawled
         result = logformatter.crawled(processed, response, spider)
         assert result["args"]["request"] == str(original)
@@ -48,6 +52,10 @@ def test_log_formatter_scrapy_2():
         original = case["original"]
         response = Response(original.url)
         processed = middleware.process_request(original, spider)
+
+        if original.meta.get("crawlera_fetch_skip"):
+            assert processed is None
+            continue
 
         # crawled
         result = logformatter.crawled(processed, response, spider)
