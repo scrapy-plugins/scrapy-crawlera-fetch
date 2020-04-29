@@ -31,7 +31,12 @@ test_requests.append(
                 "Accept": "application/json",
             },
             meta={
-                "crawlera_fetch_processed": True,
+                "crawlera_fetch_original_request": {
+                    "url": "https://httpbin.org/anything",
+                    "method": "GET",
+                    "headers": {},
+                    "body": b"",
+                },
                 "crawlera_fetch": {
                     "render": "no",
                     "region": "us",
@@ -69,7 +74,15 @@ test_requests.append(
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
-            meta={"crawlera_fetch_processed": True, "crawlera_fetch": {"device": "desktop"}},
+            meta={
+                "crawlera_fetch_original_request": {
+                    "url": "https://httpbin.org/post",
+                    "method": "POST",
+                    "headers": {b"Content-Type": [b"application/x-www-form-urlencoded"]},
+                    "body": b"foo=bar",
+                },
+                "crawlera_fetch": {"device": "desktop"},
+            },
             body=json.dumps(
                 {
                     "url": "https://httpbin.org/post",

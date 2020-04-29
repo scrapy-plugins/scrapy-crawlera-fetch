@@ -44,8 +44,17 @@ class CrawleraFetchMiddleware:
         return cls(crawler)
 
     def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
-        if request.meta.get("crawlera_fetch_skip") or request.meta.get("crawlera_fetch_processed"):
+        skip = request.meta.get("crawlera_fetch_skip")
+        processed = request.meta.get("crawlera_fetch_original_request")
+        if skip or processed:
             return None
+
+        request.meta["crawlera_fetch_original_request"] = {
+            "url": request.url,
+            "method": request.method,
+            "headers": dict(request.headers),
+            "body": request.body,
+        }
 
         # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
@@ -63,14 +72,22 @@ class CrawleraFetchMiddleware:
         if scrapy_version < (2, 0, 0):
             request.flags.append("Original URL: {}".format(request.url))
 
-        request.meta["crawlera_fetch_processed"] = True
         return request.replace(url=self.url, method="POST", body=body_json)
 
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
         if request.meta.get("crawlera_fetch_skip"):
             return response
 
-        request.meta.pop("crawlera_fetch_processed", None)
+        if response.headers.get("X-Crawlera-Error"):
+            logger.error(
+                "Error downloading <%s %s> (status: %i, X-Crawlera-Error header: %s)",
+                request.meta["crawlera_fetch_original_request"]["method"],
+                request.meta["crawlera_fetch_original_request"]["url"],
+                response.status,
+                response.headers["X-Crawlera-Error"].decode("utf8"),
+            )
+            return response
+
         json_response = json.loads(response.text)
         request.meta["crawlera_fetch_response"] = {
             "status": response.status,
