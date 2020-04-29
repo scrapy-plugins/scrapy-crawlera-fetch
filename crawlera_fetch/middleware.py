@@ -35,6 +35,8 @@ class CrawleraFetchMiddleware:
         if crawler.settings.get("CRAWLERA_FETCH_URL"):
             self.url = crawler.settings["CRAWLERA_FETCH_URL"]
 
+        self.stats = crawler.stats
+
         logger.debug(
             "Using Crawlera Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
         )
@@ -48,6 +50,9 @@ class CrawleraFetchMiddleware:
         processed = request.meta.get("crawlera_fetch_original_request")
         if skip or processed:
             return None
+
+        self.stats.inc_value("crawlera_fetch/request_count")
+        self.stats.inc_value("crawlera_fetch/request_method_count/{}".format(request.method))
 
         request.meta["crawlera_fetch_original_request"] = {
             "url": request.url,
@@ -78,17 +83,27 @@ class CrawleraFetchMiddleware:
         if request.meta.get("crawlera_fetch_skip"):
             return response
 
+        self.stats.inc_value("crawlera_fetch/response_count")
+
         if response.headers.get("X-Crawlera-Error"):
+            message = response.headers["X-Crawlera-Error"].decode("utf8")
+            self.stats.inc_value("crawlera_fetch/response_error")
+            self.stats.inc_value("crawlera_fetch/response_error/{}".format(message))
             logger.error(
                 "Error downloading <%s %s> (status: %i, X-Crawlera-Error header: %s)",
                 request.meta["crawlera_fetch_original_request"]["method"],
                 request.meta["crawlera_fetch_original_request"]["url"],
                 response.status,
-                response.headers["X-Crawlera-Error"].decode("utf8"),
+                message,
             )
             return response
 
         json_response = json.loads(response.text)
+
+        self.stats.inc_value(
+            "crawlera_fetch/response_status_count/{}".format(json_response["original_status"])
+        )
+
         request.meta["crawlera_fetch_response"] = {
             "status": response.status,
             "headers": response.headers,
