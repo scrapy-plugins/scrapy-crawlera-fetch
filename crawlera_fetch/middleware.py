@@ -80,7 +80,9 @@ class CrawleraFetchMiddleware:
         return request.replace(url=self.url, method="POST", body=body_json)
 
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
-        if request.meta.get("crawlera_fetch_skip"):
+        skip = request.meta.get("crawlera_fetch_skip")
+        processed = request.meta.get("crawlera_fetch_original_request")
+        if skip or not processed:
             return response
 
         self.stats.inc_value("crawlera_fetch/response_count")

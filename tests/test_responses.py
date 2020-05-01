@@ -24,6 +24,7 @@ def test_process_response():
         assert processed.headers == expected.headers
         assert processed.body == expected.body
 
-        assert processed.meta["crawlera_fetch_response"]["body"] == json.loads(original.text)
-        assert processed.meta["crawlera_fetch_response"]["headers"] == original.headers
-        assert processed.meta["crawlera_fetch_response"]["status"] == original.status
+        if processed.meta.get("crawlera_fetch_response"):
+            assert processed.meta["crawlera_fetch_response"]["body"] == json.loads(original.text)
+            assert processed.meta["crawlera_fetch_response"]["headers"] == original.headers
+            assert processed.meta["crawlera_fetch_response"]["status"] == original.status
