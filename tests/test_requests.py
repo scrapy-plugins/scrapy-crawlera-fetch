@@ -1,7 +1,8 @@
 import json
 from copy import deepcopy
+from unittest.mock import patch
 
-from scrapy import Spider
+from scrapy import Spider, Request
 
 from crawlera_fetch import DownloadSlotPolicy
 
@@ -55,3 +56,13 @@ def test_process_request_single_download_slot():
             processed_text = processed.body.decode(processed.encoding)
             expected_text = expected.body.decode(expected.encoding)
             assert json.loads(processed_text) == json.loads(expected_text)
+
+
+@patch("scrapy.version_info", (1, 8, 0))
+def test_process_request_scrapy_1():
+    from tests.utils import get_test_middleware
+
+    middleware = get_test_middleware()
+    request = Request("https://example.org")
+    processed = middleware.process_request(request, Spider("foo"))
+    assert processed.flags == ["original url: https://example.org"]

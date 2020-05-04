@@ -1,4 +1,4 @@
-.PHONY: lint types black clean
+.PHONY: lint types black clean all
 
 lint:
 	@python -m flake8 --exclude=.git,venv* crawlera_fetch tests
@@ -12,3 +12,6 @@ black:
 clean:
 	@find . -name "*.pyc" -delete
 	@rm -rf .mypy_cache/ .tox/ build/ dist/ htmlcov/ .coverage coverage.xml
+
+all:
+	@make lint && make types && make black

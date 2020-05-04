@@ -3,7 +3,7 @@ import logging
 from enum import Enum
 from typing import Optional, Type, TypeVar
 
-from scrapy import version_info as scrapy_version
+import scrapy
 from scrapy.crawler import Crawler
 from scrapy.exceptions import NotConfigured
 from scrapy.http.request import Request
@@ -88,7 +88,7 @@ class CrawleraFetchMiddleware:
         }
         request.headers.update(headers)
 
-        if scrapy_version < (2, 0, 0):
+        if scrapy.version_info < (2, 0, 0):
             request.flags.append("original url: {}".format(request.url))
 
         return request.replace(url=self.url, method="POST", body=body_json)
