@@ -1,7 +1,11 @@
 import json
 
+import pytest
 from scrapy import Spider, Request
 from scrapy.http.response.text import TextResponse
+from testfixtures import LogCapture
+
+from crawlera_fetch.middleware import CrawleraFetchException
 
 from tests.data.responses import test_responses
 from tests.utils import get_test_middleware
@@ -80,15 +84,38 @@ def test_process_response_error():
                     }
                 },
             ),
-            body=b"Bad JSON",
+            body=b'{"Bad": "JSON',
         ),
     ]
 
-    middleware = get_test_middleware()
+    middleware_raise = get_test_middleware(settings={"CRAWLERA_FETCH_RAISE_ON_ERROR": True})
     for response in response_list:
-        processed = middleware.process_response(response.request, response, Spider("foo"))
-        assert response is processed
+        with pytest.raises(CrawleraFetchException):
+            middleware_raise.process_response(response.request, response, Spider("foo"))
 
-    assert middleware.stats.get_value("crawlera_fetch/response_error") == 2
-    assert middleware.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
-    assert middleware.stats.get_value("crawlera_fetch/response_error/JSONDecodeError") == 1
+    assert middleware_raise.stats.get_value("crawlera_fetch/response_error") == 2
+    assert middleware_raise.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
+    assert middleware_raise.stats.get_value("crawlera_fetch/response_error/JSONDecodeError") == 1
+
+    middleware_log = get_test_middleware(settings={"CRAWLERA_FETCH_RAISE_ON_ERROR": False})
+    with LogCapture() as logs:
+        for response in response_list:
+            processed = middleware_log.process_response(response.request, response, Spider("foo"))
+            assert response is processed
+
+    logs.check_present(
+        (
+            "crawlera-fetch-middleware",
+            "ERROR",
+            "Error downloading <GET https://example.org> (status: 200, X-Crawlera-Error header: bad_proxy_auth)",  # noqa: E501
+        ),
+        (
+            "crawlera-fetch-middleware",
+            "ERROR",
+            "Error decoding <GET https://example.org> (status: 200, message: Unterminated string starting at, lineno: 1, colno: 9)",  # noqa: E501
+        ),
+    )
+
+    assert middleware_log.stats.get_value("crawlera_fetch/response_error") == 2
+    assert middleware_log.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
+    assert middleware_log.stats.get_value("crawlera_fetch/response_error/JSONDecodeError") == 1

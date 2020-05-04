@@ -25,6 +25,10 @@ class DownloadSlotPolicy(Enum):
     Default = "default"
 
 
+class CrawleraFetchException(Exception):
+    pass
+
+
 class CrawleraFetchMiddleware:
 
     url = "https://api.crawlera.com/fetch/v2"
@@ -45,6 +49,8 @@ class CrawleraFetchMiddleware:
         self.download_slot_policy = crawler.settings.get(
             "CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
         )
+
+        self.raise_on_error = crawler.settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR", True)
 
         self.crawler = crawler
         self.stats = crawler.stats
@@ -105,21 +111,25 @@ class CrawleraFetchMiddleware:
             message = response.headers["X-Crawlera-Error"].decode("utf8")
             self.stats.inc_value("crawlera_fetch/response_error")
             self.stats.inc_value("crawlera_fetch/response_error/{}".format(message))
-            logger.error(
+            crawlera_error_args = (
                 "Error downloading <%s %s> (status: %i, X-Crawlera-Error header: %s)",
                 request.meta["crawlera_fetch_original_request"]["method"],
                 request.meta["crawlera_fetch_original_request"]["url"],
                 response.status,
                 message,
             )
-            return response
+            if self.raise_on_error:
+                raise CrawleraFetchException(*crawlera_error_args)
+            else:
+                logger.error(*crawlera_error_args)
+                return response
 
         try:
             json_response = json.loads(response.text)
         except json.JSONDecodeError as exc:
             self.stats.inc_value("crawlera_fetch/response_error")
             self.stats.inc_value("crawlera_fetch/response_error/JSONDecodeError")
-            logger.error(
+            json_decode_args = (
                 "Error decoding <%s %s> (status: %i, message: %s, lineno: %i, colno: %i)",
                 request.meta["crawlera_fetch_original_request"]["method"],
                 request.meta["crawlera_fetch_original_request"]["url"],
@@ -128,7 +138,11 @@ class CrawleraFetchMiddleware:
                 exc.lineno,
                 exc.colno,
             )
-            return response
+            if self.raise_on_error:
+                raise CrawleraFetchException(*json_decode_args)
+            else:
+                logger.error(*json_decode_args)
+                return response
 
         self.stats.inc_value(
             "crawlera_fetch/response_status_count/{}".format(json_response["original_status"])
