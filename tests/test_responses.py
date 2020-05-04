@@ -1,7 +1,7 @@
 import json
 
 from scrapy import Spider, Request
-from scrapy.http.response import Response
+from scrapy.http.response.text import TextResponse
 
 from tests.data.responses import test_responses
 from tests.utils import get_test_middleware
@@ -29,7 +29,7 @@ def test_process_response():
 
 
 def test_process_response_skip():
-    response = Response(
+    response = TextResponse(
         url="https://example.org",
         status=200,
         headers={
@@ -48,27 +48,47 @@ def test_process_response_skip():
 
 
 def test_process_response_error():
-    response = Response(
-        url="https://crawlera.com/fake/api/endpoint",
-        request=Request(
+    response_list = [
+        TextResponse(
             url="https://crawlera.com/fake/api/endpoint",
-            meta={
-                "crawlera_fetch_original_request": {"url": "https://example.org", "method": "GET"}
+            request=Request(
+                url="https://crawlera.com/fake/api/endpoint",
+                meta={
+                    "crawlera_fetch_original_request": {
+                        "url": "https://example.org",
+                        "method": "GET",
+                    }
+                },
+            ),
+            headers={
+                "X-Crawlera-Error": "bad_proxy_auth",
+                "Proxy-Authenticate": 'Basic realm="Crawlera"',
+                "Content-Length": "0",
+                "Date": "Mon, 04 May 2020 13:06:15 GMT",
+                "Proxy-Connection": "close",
+                "Connection": "close",
             },
         ),
-        headers={
-            "X-Crawlera-Error": "bad_proxy_auth",
-            "Proxy-Authenticate": 'Basic realm="Crawlera"',
-            "Content-Length": "0",
-            "Date": "Mon, 04 May 2020 13:06:15 GMT",
-            "Proxy-Connection": "close",
-            "Connection": "close",
-        },
-    )
+        TextResponse(
+            url="https://crawlera.com/fake/api/endpoint",
+            request=Request(
+                url="https://crawlera.com/fake/api/endpoint",
+                meta={
+                    "crawlera_fetch_original_request": {
+                        "url": "https://example.org",
+                        "method": "GET",
+                    }
+                },
+            ),
+            body=b"Bad JSON",
+        ),
+    ]
 
     middleware = get_test_middleware()
-    processed = middleware.process_response(response.request, response, Spider("foo"))
+    for response in response_list:
+        processed = middleware.process_response(response.request, response, Spider("foo"))
+        assert response is processed
 
-    assert response is processed
-    assert middleware.stats.get_value("crawlera_fetch/response_error") == 1
+    assert middleware.stats.get_value("crawlera_fetch/response_error") == 2
     assert middleware.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
+    assert middleware.stats.get_value("crawlera_fetch/response_error/JSONDecodeError") == 1

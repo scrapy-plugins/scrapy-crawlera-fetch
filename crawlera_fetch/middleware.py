@@ -114,7 +114,21 @@ class CrawleraFetchMiddleware:
             )
             return response
 
-        json_response = json.loads(response.text)
+        try:
+            json_response = json.loads(response.text)
+        except json.JSONDecodeError as exc:
+            self.stats.inc_value("crawlera_fetch/response_error")
+            self.stats.inc_value("crawlera_fetch/response_error/JSONDecodeError")
+            logger.error(
+                "Error decoding <%s %s> (status: %i, message: %s, lineno: %i, colno: %i)",
+                request.meta["crawlera_fetch_original_request"]["method"],
+                request.meta["crawlera_fetch_original_request"]["url"],
+                response.status,
+                exc.msg,
+                exc.lineno,
+                exc.colno,
+            )
+            return response
 
         self.stats.inc_value(
             "crawlera_fetch/response_status_count/{}".format(json_response["original_status"])
