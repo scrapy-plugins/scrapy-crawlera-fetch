@@ -116,16 +116,3 @@ test_responses.append(
         ),
     }
 )
-
-skipped = HtmlResponse(
-    url="https://example.org",
-    status=200,
-    headers={
-        "Content-Encoding": "gzip",
-        "Transfer-Encoding": "chunked",
-        "Date": "Fri, 24 Apr 2020 18:06:42 GMT",
-    },
-    request=Request(url="https://example.org", meta={"crawlera_fetch_skip": True}),
-    body=b"""<html></html>""",
-)
-test_responses.append({"original": skipped, "expected": skipped})
