@@ -4,19 +4,17 @@ from logging import LogRecord, Formatter
 
 from scrapy import Spider, version_info as scrapy_version
 from scrapy.http.response import Response
-from scrapy.utils.test import get_crawler
 from twisted.python.failure import Failure
 
 from crawlera_fetch.logformatter import CrawleraFetchLogFormatter
-from crawlera_fetch.middleware import CrawleraFetchMiddleware
 
-from tests.data import SETTINGS
 from tests.data.requests import test_requests
+from tests.utils import get_test_middleware
 
 
 @unittest.skipIf(scrapy_version > (2, 0, 0), "Scrapy < 2.0 only")
 def test_log_formatter_scrapy_1():
-    middleware = CrawleraFetchMiddleware(get_crawler(settings_dict=SETTINGS))
+    middleware = get_test_middleware()
     logformatter = CrawleraFetchLogFormatter()
     formatter = Formatter()
     spider = Spider("foo")
@@ -35,7 +33,7 @@ def test_log_formatter_scrapy_1():
         assert result["args"]["request"] == str(original)
         record = LogRecord(name="logger", pathname="n/a", lineno=1, exc_info=None, **result)
         logstr = formatter.format(record)
-        expected = "Crawled (200) {request} ['Original URL: {url}'] (referer: None)".format(
+        expected = "Crawled (200) {request} ['original url: {url}'] (referer: None)".format(
             request=original, url=original.url
         )
         assert logstr == expected
@@ -43,7 +41,7 @@ def test_log_formatter_scrapy_1():
 
 @unittest.skipIf(scrapy_version < (2, 0, 0), "Scrapy >= 2.0 only")
 def test_log_formatter_scrapy_2():
-    middleware = CrawleraFetchMiddleware(get_crawler(settings_dict=SETTINGS))
+    middleware = get_test_middleware()
     logformatter = CrawleraFetchLogFormatter()
     formatter = Formatter()
     spider = Spider("foo")

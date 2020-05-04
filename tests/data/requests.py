@@ -43,6 +43,7 @@ test_requests.append(
                     "iptype": "datacenter",
                     "device": "mobile",
                 },
+                "download_slot": "httpbin.org",
             },
             body=json.dumps(
                 {
@@ -82,6 +83,7 @@ test_requests.append(
                     "body": b"foo=bar",
                 },
                 "crawlera_fetch": {"device": "desktop"},
+                "download_slot": "httpbin.org",
             },
             body=json.dumps(
                 {

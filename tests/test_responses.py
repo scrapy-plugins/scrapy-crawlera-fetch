@@ -1,16 +1,13 @@
 import json
 
 from scrapy import Spider
-from scrapy.utils.test import get_crawler
 
-from crawlera_fetch import CrawleraFetchMiddleware
-
-from tests.data import SETTINGS
 from tests.data.responses import test_responses
+from tests.utils import get_test_middleware
 
 
 def test_process_response():
-    middleware = CrawleraFetchMiddleware.from_crawler(get_crawler(settings_dict=SETTINGS))
+    middleware = get_test_middleware()
 
     for case in test_responses:
         original = case["original"]

@@ -1,5 +1,6 @@
 import json
 import logging
+from enum import Enum
 from typing import Optional, Type, TypeVar
 
 from scrapy import version_info as scrapy_version
@@ -16,6 +17,12 @@ logger = logging.getLogger("crawlera-fetch-middleware")
 
 
 MiddlewareTypeVar = TypeVar("MiddlewareTypeVar", bound="CrawleraFetchMiddleware")
+
+
+class DownloadSlotPolicy(Enum):
+    Domain = "domain"
+    Single = "single"
+    Default = "default"
 
 
 class CrawleraFetchMiddleware:
@@ -35,6 +42,11 @@ class CrawleraFetchMiddleware:
         if crawler.settings.get("CRAWLERA_FETCH_URL"):
             self.url = crawler.settings["CRAWLERA_FETCH_URL"]
 
+        self.download_slot_policy = crawler.settings.get(
+            "CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
+        )
+
+        self.crawler = crawler
         self.stats = crawler.stats
 
         logger.debug(
@@ -50,6 +62,8 @@ class CrawleraFetchMiddleware:
         processed = request.meta.get("crawlera_fetch_original_request")
         if skip or processed:
             return None
+
+        self._set_download_slot(request, spider)
 
         self.stats.inc_value("crawlera_fetch/request_count")
         self.stats.inc_value("crawlera_fetch/request_method_count/{}".format(request.method))
@@ -75,7 +89,7 @@ class CrawleraFetchMiddleware:
         request.headers.update(headers)
 
         if scrapy_version < (2, 0, 0):
-            request.flags.append("Original URL: {}".format(request.url))
+            request.flags.append("original url: {}".format(request.url))
 
         return request.replace(url=self.url, method="POST", body=body_json)
 
@@ -116,8 +130,17 @@ class CrawleraFetchMiddleware:
         )
         return response.replace(
             cls=respcls,
+            request=request.replace(url="https://scrapinghub.com"),
             headers=json_response["headers"],
             url=json_response["url"],
             body=json_response["body"],
             status=json_response["original_status"],
         )
+
+    def _set_download_slot(self, request, spider):
+        if self.download_slot_policy == DownloadSlotPolicy.Domain:
+            slot = self.crawler.engine.downloader._get_slot_key(request, spider)
+            request.meta["download_slot"] = slot
+        elif self.download_slot_policy == DownloadSlotPolicy.single:
+            request.meta["download_slot"] = "__crawlera_fetch__"
+        # Otherwise use Scrapy default policy

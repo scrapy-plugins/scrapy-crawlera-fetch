@@ -26,12 +26,17 @@ Crawlera middleware won't be able to handle them.
 
 ### Settings
 
-* `CRAWLERA_FETCH_ENABLED` - Whether or not the middleware will be enabled,
+* `CRAWLERA_FETCH_ENABLED` (type `bool`). Whether or not the middleware will be enabled,
     i.e. requests should be downloaded using the Crawlera Fetch API
-* `CRAWLERA_FETCH_APIKEY` - API key to be used to authenticate against the Crawlera endpoint
+* `CRAWLERA_FETCH_APIKEY` (type `str`). API key to be used to authenticate against the Crawlera endpoint
     (mandatory if enabled)
-* `CRAWLERA_FETCH_URL` - The endpoint of a specific Crawlera instance,
+* `CRAWLERA_FETCH_URL` (Type `str`). The endpoint of a specific Crawlera instance,
     defaults to https://api.crawlera.com/fetch/v2
+* `CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY` (type `enum.Enum` - `crawlera_fetch.DownloadSlotPolicy`).
+    Possible values are `DownloadSlotPolicy.Domain`, `DownloadSlotPolicy.Single`,
+    `DownloadSlotPolicydefault` (Scrapy default). If set to `DownloadSlotPolicy.Domain`, please
+    consider setting `SCHEDULER_PRIORITY_QUEUE="scrapy.pqueues.DownloaderAwarePriorityQueue"` to
+    make better usage of concurrency options and avoid delays.
 
 ### Log formatter
 

@@ -2,16 +2,13 @@ import json
 from copy import deepcopy
 
 from scrapy import Spider
-from scrapy.utils.test import get_crawler
 
-from crawlera_fetch import CrawleraFetchMiddleware
-
-from tests.data import SETTINGS
 from tests.data.requests import test_requests
+from tests.utils import get_test_middleware
 
 
 def test_process_request():
-    middleware = CrawleraFetchMiddleware.from_crawler(get_crawler(settings_dict=SETTINGS))
+    middleware = get_test_middleware()
 
     for case in deepcopy(test_requests):
         original = case["original"]
