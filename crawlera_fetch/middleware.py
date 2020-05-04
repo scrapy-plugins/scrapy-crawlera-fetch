@@ -19,6 +19,9 @@ logger = logging.getLogger("crawlera-fetch-middleware")
 MiddlewareTypeVar = TypeVar("MiddlewareTypeVar", bound="CrawleraFetchMiddleware")
 
 
+META_KEY = "crawlera_fetch"
+
+
 class DownloadSlotPolicy(Enum):
     Domain = "domain"
     Single = "single"
@@ -64,9 +67,12 @@ class CrawleraFetchMiddleware:
         return cls(crawler)
 
     def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
-        skip = request.meta.get("crawlera_fetch_skip")
-        processed = request.meta.get("crawlera_fetch_original_request")
-        if skip or processed:
+        try:
+            crawlera_meta = request.meta[META_KEY]
+        except KeyError:
+            crawlera_meta = {}
+
+        if crawlera_meta.get("skip") or crawlera_meta.get("original_request"):
             return None
 
         self._set_download_slot(request, spider)
@@ -74,7 +80,7 @@ class CrawleraFetchMiddleware:
         self.stats.inc_value("crawlera_fetch/request_count")
         self.stats.inc_value("crawlera_fetch/request_method_count/{}".format(request.method))
 
-        request.meta["crawlera_fetch_original_request"] = {
+        crawlera_meta["original_request"] = {
             "url": request.url,
             "method": request.method,
             "headers": dict(request.headers),
@@ -84,7 +90,7 @@ class CrawleraFetchMiddleware:
         # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
         body = {"url": request.url, "method": request.method, "body": original_body_text}
-        body.update(request.meta.get("crawlera_fetch") or {})
+        body.update(crawlera_meta.get("args") or {})
         body_json = json.dumps(body)
 
         headers = {
@@ -100,9 +106,12 @@ class CrawleraFetchMiddleware:
         return request.replace(url=self.url, method="POST", body=body_json)
 
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
-        skip = request.meta.get("crawlera_fetch_skip")
-        processed = request.meta.get("crawlera_fetch_original_request")
-        if skip or not processed:
+        try:
+            crawlera_meta = request.meta[META_KEY]
+        except KeyError:
+            crawlera_meta = {}
+
+        if crawlera_meta.get("skip") or not crawlera_meta.get("original_request"):
             return response
 
         self.stats.inc_value("crawlera_fetch/response_count")
@@ -113,8 +122,8 @@ class CrawleraFetchMiddleware:
             self.stats.inc_value("crawlera_fetch/response_error/{}".format(message))
             crawlera_error_args = (
                 "Error downloading <%s %s> (status: %i, X-Crawlera-Error header: %s)",
-                request.meta["crawlera_fetch_original_request"]["method"],
-                request.meta["crawlera_fetch_original_request"]["url"],
+                crawlera_meta["original_request"]["method"],
+                crawlera_meta["original_request"]["url"],
                 response.status,
                 message,
             )
@@ -131,8 +140,8 @@ class CrawleraFetchMiddleware:
             self.stats.inc_value("crawlera_fetch/response_error/JSONDecodeError")
             json_decode_args = (
                 "Error decoding <%s %s> (status: %i, message: %s, lineno: %i, colno: %i)",
-                request.meta["crawlera_fetch_original_request"]["method"],
-                request.meta["crawlera_fetch_original_request"]["url"],
+                crawlera_meta["original_request"]["method"],
+                crawlera_meta["original_request"]["url"],
                 response.status,
                 exc.msg,
                 exc.lineno,
@@ -148,7 +157,7 @@ class CrawleraFetchMiddleware:
             "crawlera_fetch/response_status_count/{}".format(json_response["original_status"])
         )
 
-        request.meta["crawlera_fetch_response"] = {
+        crawlera_meta["upstream_response"] = {
             "status": response.status,
             "headers": response.headers,
             "body": json_response,

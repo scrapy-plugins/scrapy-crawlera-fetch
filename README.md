@@ -85,12 +85,12 @@ Request(url="<Crawlera Fetch API endpoint>", method="POST",
 
 ### Additional arguments
 
-Additional arguments could be specified under the `crawlera_fetch` `Request.meta` key. For instance:
+Additional arguments could be specified under the `crawlera_fetch.args` `Request.meta` key. For instance:
 
 ```python
 Request(
     url="https://example.org",
-    meta={"crawlera_fetch": {"region": "us", "device": "mobile"}},
+    meta={"crawlera_fetch": {"args": {"region": "us", "device": "mobile"}}},
 )
 ```
 
@@ -100,13 +100,23 @@ is translated into the following body:
 '{"url": "https://example.org", "method": "GET", "body": "", "region": "us", "device": "mobile"}'
 ```
 
-### Accessing raw Crawlera responses
+### Accessing original request and raw Crawlera response
+
+The `url`, `method`, `headers` and `body` attributes of the originalrequest are available under
+the `crawlera_fetch.original_request` `Response.meta` key.
 
 The `status`, `headers` and `body` attributes of the upstream Crawlera response are available under
-the `crawlera_fetch_response` `Response.meta` key.
+the `crawlera_fetch.upstream_response` `Response.meta` key.
 
 ### Skipping requests
 
-You can instruct the middleware to skip a specific request by setting the `crawlera_fetch_skip`
+You can instruct the middleware to skip a specific request by setting the `crawlera_fetch.skip`
 [Request.meta](https://docs.scrapy.org/en/latest/topics/request-response.html#scrapy.http.Request.meta)
-key.
+key:
+
+```python
+Request(
+    url="https://example.org",
+    meta={"crawlera_fetch": {"skip": True}},
+)
+```

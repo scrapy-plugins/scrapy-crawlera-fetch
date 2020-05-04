@@ -26,10 +26,11 @@ def test_process_response():
         assert processed.headers == expected.headers
         assert processed.body == expected.body
 
-        if processed.meta.get("crawlera_fetch_response"):
-            assert processed.meta["crawlera_fetch_response"]["body"] == json.loads(original.text)
-            assert processed.meta["crawlera_fetch_response"]["headers"] == original.headers
-            assert processed.meta["crawlera_fetch_response"]["status"] == original.status
+        crawlera_meta = processed.meta.get("crawlera_fetch") or {}
+        if crawlera_meta.get("upstream_response"):
+            assert crawlera_meta["upstream_response"]["body"] == json.loads(original.text)
+            assert crawlera_meta["upstream_response"]["headers"] == original.headers
+            assert crawlera_meta["upstream_response"]["status"] == original.status
 
 
 def test_process_response_skip():
@@ -41,7 +42,7 @@ def test_process_response_skip():
             "Transfer-Encoding": "chunked",
             "Date": "Fri, 24 Apr 2020 18:06:42 GMT",
         },
-        request=Request(url="https://example.org", meta={"crawlera_fetch_skip": True}),
+        request=Request(url="https://example.org", meta={"crawlera_fetch": {"skip": True}}),
         body=b"""<html></html>""",
     )
 
@@ -58,9 +59,8 @@ def test_process_response_error():
             request=Request(
                 url="https://crawlera.com/fake/api/endpoint",
                 meta={
-                    "crawlera_fetch_original_request": {
-                        "url": "https://example.org",
-                        "method": "GET",
+                    "crawlera_fetch": {
+                        "original_request": {"url": "https://example.org", "method": "GET"}
                     }
                 },
             ),
@@ -78,9 +78,8 @@ def test_process_response_error():
             request=Request(
                 url="https://crawlera.com/fake/api/endpoint",
                 meta={
-                    "crawlera_fetch_original_request": {
-                        "url": "https://example.org",
-                        "method": "GET",
+                    "crawlera_fetch": {
+                        "original_request": {"url": "https://example.org", "method": "GET"}
                     }
                 },
             ),

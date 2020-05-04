@@ -19,7 +19,8 @@ def test_process_request():
 
         processed = middleware.process_request(original, Spider("foo"))
 
-        if original.meta.get("crawlera_fetch_skip"):
+        crawlera_meta = original.meta.get("crawlera_fetch")
+        if crawlera_meta.get("skip"):
             assert processed is None
         else:
             assert type(processed) is type(expected)
@@ -45,7 +46,8 @@ def test_process_request_single_download_slot():
 
         processed = middleware.process_request(original, Spider("foo"))
 
-        if original.meta.get("crawlera_fetch_skip"):
+        crawlera_meta = original.meta.get("crawlera_fetch")
+        if crawlera_meta.get("skip"):
             assert processed is None
         else:
             assert type(processed) is type(expected)

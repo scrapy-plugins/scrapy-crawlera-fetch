@@ -24,7 +24,8 @@ def test_log_formatter_scrapy_1():
         response = Response(original.url)
         processed = middleware.process_request(original, spider)
 
-        if original.meta.get("crawlera_fetch_skip"):
+        crawlera_meta = original.meta.get("crawlera_fetch") or {}
+        if crawlera_meta.get("skip"):
             assert processed is None
             continue
 
@@ -51,7 +52,8 @@ def test_log_formatter_scrapy_2():
         response = Response(original.url)
         processed = middleware.process_request(original, spider)
 
-        if original.meta.get("crawlera_fetch_skip"):
+        crawlera_meta = original.meta.get("crawlera_fetch") or {}
+        if crawlera_meta.get("skip"):
             assert processed is None
             continue
 
