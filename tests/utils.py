@@ -24,8 +24,10 @@ class FooSpider(Spider):
     name = "foo"
 
 
-def get_test_middleware():
-    crawler = get_crawler(FooSpider, settings_dict=SETTINGS)
+def get_test_middleware(settings=None):
+    settings_dict = SETTINGS.copy()
+    settings_dict.update(settings or {})
+    crawler = get_crawler(FooSpider, settings_dict=settings_dict)
     crawler.engine = MockEngine()
     middleware = CrawleraFetchMiddleware.from_crawler(crawler)
     return middleware

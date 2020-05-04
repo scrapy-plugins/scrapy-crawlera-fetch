@@ -141,6 +141,6 @@ class CrawleraFetchMiddleware:
         if self.download_slot_policy == DownloadSlotPolicy.Domain:
             slot = self.crawler.engine.downloader._get_slot_key(request, spider)
             request.meta["download_slot"] = slot
-        elif self.download_slot_policy == DownloadSlotPolicy.single:
+        elif self.download_slot_policy == DownloadSlotPolicy.Single:
             request.meta["download_slot"] = "__crawlera_fetch__"
         # Otherwise use Scrapy default policy
