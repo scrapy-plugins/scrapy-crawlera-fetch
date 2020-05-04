@@ -36,7 +36,8 @@ Crawlera middleware won't be able to handle them.
     The endpoint of a specific Crawlera instance
 
 * `CRAWLERA_FETCH_RAISE_ON_ERROR` (type `bool`, default `True`). Whether or not the middleware will
-    raise an exception if an error occurs while downloading a request.
+    raise an exception if an error occurs while downloading or decoding a request. If `False`, the
+    raw upstream response will be returned.
 
 * `CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY` (type `enum.Enum` - `crawlera_fetch.DownloadSlotPolicy`,
     default `DownloadSlotPolicy.Domain`).
