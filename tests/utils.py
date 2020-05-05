@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from unittest.mock import Mock
 
 from scrapy import Spider
 from scrapy.utils.test import get_crawler
@@ -31,3 +32,6 @@ def get_test_middleware(settings=None):
     crawler.engine = MockEngine()
     middleware = CrawleraFetchMiddleware.from_crawler(crawler)
     return middleware
+
+
+mocked_time = Mock(return_value=1234567890.123)

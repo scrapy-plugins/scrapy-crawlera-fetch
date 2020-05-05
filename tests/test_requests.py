@@ -7,9 +7,10 @@ from scrapy import Spider, Request
 from crawlera_fetch import DownloadSlotPolicy
 
 from tests.data.requests import test_requests
-from tests.utils import get_test_middleware
+from tests.utils import get_test_middleware, mocked_time
 
 
+@patch("time.time", mocked_time)
 def test_process_request():
     middleware = get_test_middleware()
 
@@ -33,6 +34,7 @@ def test_process_request():
             assert json.loads(processed_text) == json.loads(expected_text)
 
 
+@patch("time.time", mocked_time)
 def test_process_request_single_download_slot():
     middleware = get_test_middleware(
         settings={"CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY": DownloadSlotPolicy.Single}

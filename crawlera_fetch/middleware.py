@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from enum import Enum
 from typing import Optional, Type, TypeVar
 
@@ -55,8 +56,11 @@ class CrawleraFetchMiddleware:
 
         self.raise_on_error = crawler.settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR", True)
 
+        crawler.signals.connect(self.spider_closed, signal=scrapy.signals.spider_closed)
+
         self.crawler = crawler
         self.stats = crawler.stats
+        self.total_latency = 0
 
         logger.debug(
             "Using Crawlera Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
@@ -65,6 +69,11 @@ class CrawleraFetchMiddleware:
     @classmethod
     def from_crawler(cls: Type[MiddlewareTypeVar], crawler: Crawler) -> MiddlewareTypeVar:
         return cls(crawler)
+
+    def spider_closed(self, spider, reason):
+        self.stats.set_value("crawlera_fetch/total_latency", self.total_latency)
+        avg_latency = self.total_latency / self.stats.get_value("crawlera_fetch/response_count")
+        self.stats.set_value("crawlera_fetch/avg_latency", avg_latency)
 
     def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
         try:
@@ -80,29 +89,34 @@ class CrawleraFetchMiddleware:
         self.stats.inc_value("crawlera_fetch/request_count")
         self.stats.inc_value("crawlera_fetch/request_method_count/{}".format(request.method))
 
-        crawlera_meta["original_request"] = {
-            "url": request.url,
-            "method": request.method,
-            "headers": dict(request.headers),
-            "body": request.body,
-        }
-
         # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
         body = {"url": request.url, "method": request.method, "body": original_body_text}
         body.update(crawlera_meta.get("args") or {})
         body_json = json.dumps(body)
 
-        headers = {
+        additional_meta = {
+            "original_request": {
+                "url": request.url,
+                "method": request.method,
+                "headers": dict(request.headers),
+                "body": request.body,
+            },
+            "timing": {"start_ts": time.time()},
+        }
+        crawlera_meta.update(additional_meta)
+
+        additional_headers = {
             "Authorization": self.auth_header,
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        request.headers.update(headers)
+        request.headers.update(additional_headers)
 
         if scrapy.version_info < (2, 0, 0):
             request.flags.append("original url: {}".format(request.url))
 
+        request.meta[META_KEY] = crawlera_meta
         return request.replace(url=self.url, method="POST", body=body_json)
 
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
@@ -115,6 +129,7 @@ class CrawleraFetchMiddleware:
             return response
 
         self.stats.inc_value("crawlera_fetch/response_count")
+        self._calculate_latency(request)
 
         if response.headers.get("X-Crawlera-Error"):
             message = response.headers["X-Crawlera-Error"].decode("utf8")
@@ -181,3 +196,11 @@ class CrawleraFetchMiddleware:
         elif self.download_slot_policy == DownloadSlotPolicy.Single:
             request.meta["download_slot"] = "__crawlera_fetch__"
         # Otherwise use Scrapy default policy
+
+    def _calculate_latency(self, request):
+        timing = request.meta[META_KEY]["timing"]
+        timing["end_ts"] = time.time()
+        timing["latency"] = timing["end_ts"] - timing["start_ts"]
+        self.total_latency += timing["latency"]
+        max_latency = max(self.stats.get_value("crawlera_fetch/max_latency", 0), timing["latency"])
+        self.stats.set_value("crawlera_fetch/max_latency", max_latency)

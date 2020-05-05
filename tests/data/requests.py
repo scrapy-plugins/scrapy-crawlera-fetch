@@ -4,6 +4,7 @@ from scrapy import Request, FormRequest
 from w3lib.http import basic_auth_header
 
 from tests.data import SETTINGS
+from tests.utils import mocked_time
 
 
 test_requests = []
@@ -46,6 +47,7 @@ test_requests.append(
                         "headers": {},
                         "body": b"",
                     },
+                    "timing": {"start_ts": mocked_time()},
                 },
                 "download_slot": "httpbin.org",
             },
@@ -88,6 +90,7 @@ test_requests.append(
                         "headers": {b"Content-Type": [b"application/x-www-form-urlencoded"]},
                         "body": b"foo=bar",
                     },
+                    "timing": {"start_ts": mocked_time()},
                 },
                 "download_slot": "httpbin.org",
             },

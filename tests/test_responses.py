@@ -8,7 +8,7 @@ from testfixtures import LogCapture
 from crawlera_fetch.middleware import CrawleraFetchException
 
 from tests.data.responses import test_responses
-from tests.utils import get_test_middleware
+from tests.utils import get_test_middleware, mocked_time
 
 
 def test_process_response():
@@ -60,7 +60,8 @@ def test_process_response_error():
                 url="https://crawlera.com/fake/api/endpoint",
                 meta={
                     "crawlera_fetch": {
-                        "original_request": {"url": "https://example.org", "method": "GET"}
+                        "timing": {"start_ts": mocked_time()},
+                        "original_request": {"url": "https://example.org", "method": "GET"},
                     }
                 },
             ),
@@ -79,7 +80,8 @@ def test_process_response_error():
                 url="https://crawlera.com/fake/api/endpoint",
                 meta={
                     "crawlera_fetch": {
-                        "original_request": {"url": "https://example.org", "method": "GET"}
+                        "timing": {"start_ts": mocked_time()},
+                        "original_request": {"url": "https://example.org", "method": "GET"},
                     }
                 },
             ),
