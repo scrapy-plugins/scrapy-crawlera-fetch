@@ -4,9 +4,19 @@ This package provides a Scrapy [Downloader Middleware](https://docs.scrapy.org/e
 to transparently interact with the [Crawlera Fetch API](https://scrapinghub.atlassian.net/wiki/spaces/CRAWLERA/pages/889979197/Simple+Fetch+API).
 
 
+## Requirements
+
+* Python 3.6+
+* Scrapy 1.6+
+
+
 ## Installation
 
-Work in progress - Package is currently private
+Not yet available on PyPI, the package is currently private.
+However, it can be installed directly from GitHub:
+
+* `pip install git+ssh://git@github.com/scrapinghub/scrapy-uncork.git`
+* `pip install git+https://github.com/scrapinghub/scrapy-uncork.git`
 
 
 ## Configuration
