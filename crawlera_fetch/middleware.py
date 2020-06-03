@@ -155,8 +155,8 @@ class CrawleraFetchMiddleware:
         except json.JSONDecodeError as exc:
             self.stats.inc_value("crawlera_fetch/response_error")
             self.stats.inc_value("crawlera_fetch/response_error/JSONDecodeError")
-            json_decode_args = (
-                "Error decoding <%s %s> (status: %i, message: %s, lineno: %i, colno: %i)",
+            msg = "Error decoding <{} {}> (status: {}, message: {}, lineno: {}, colno: {})"
+            msg = msg.format(
                 crawlera_meta["original_request"]["method"],
                 crawlera_meta["original_request"]["url"],
                 response.status,
@@ -165,9 +165,9 @@ class CrawleraFetchMiddleware:
                 exc.colno,
             )
             if self.raise_on_error:
-                raise CrawleraFetchException(*json_decode_args)
+                raise CrawleraFetchException(msg) from exc
             else:
-                logger.error(*json_decode_args)
+                logger.error(msg)
                 return response
 
         self.stats.inc_value(
