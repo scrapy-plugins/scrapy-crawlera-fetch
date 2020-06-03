@@ -133,6 +133,8 @@ class CrawleraFetchMiddleware:
         self.stats.inc_value("crawlera_fetch/response_count")
         self._calculate_latency(request)
 
+        self.stats.inc_value("crawlera_fetch/api_status_count/{}".format(response.status))
+
         if response.headers.get("X-Crawlera-Error"):
             message = response.headers["X-Crawlera-Error"].decode("utf8")
             self.stats.inc_value("crawlera_fetch/response_error")
