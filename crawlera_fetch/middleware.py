@@ -72,8 +72,10 @@ class CrawleraFetchMiddleware:
 
     def spider_closed(self, spider, reason):
         self.stats.set_value("crawlera_fetch/total_latency", self.total_latency)
-        avg_latency = self.total_latency / self.stats.get_value("crawlera_fetch/response_count")
-        self.stats.set_value("crawlera_fetch/avg_latency", avg_latency)
+        response_count = self.stats.get_value("crawlera_fetch/response_count")
+        if response_count:
+            avg_latency = self.total_latency / response_count
+            self.stats.set_value("crawlera_fetch/avg_latency", avg_latency)
 
     def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
         try:
