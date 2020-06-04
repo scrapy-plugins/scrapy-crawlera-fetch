@@ -14,11 +14,11 @@ to transparently interact with the [Crawlera Fetch API](https://scrapinghub.atla
 
 Not yet available on PyPI. However, it can be installed directly from GitHub:
 
-`pip install git+ssh://git@github.com/scrapinghub/scrapy-crawlera-fetch.git`
+`pip install git+ssh://git@github.com/scrapy-plugins/scrapy-crawlera-fetch.git`
 
 or
 
-`pip install git+https://github.com/scrapinghub/scrapy-crawlera-fetch.git`
+`pip install git+https://github.com/scrapy-plugins/scrapy-crawlera-fetch.git`
 
 
 ## Configuration

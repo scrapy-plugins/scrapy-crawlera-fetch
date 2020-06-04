@@ -13,7 +13,7 @@ setuptools.setup(
     long_description=long_description,
     author="Scrapinghub",
     author_email="info@scrapinghub.com",
-    url="https://github.com/scrapinghub/scrapy-crawlera-fetch",
+    url="https://github.com/scrapy-plugins/scrapy-crawlera-fetch",
     packages=["crawlera_fetch"],
     classifiers=[
         "Development Status :: 1 - Planning",
