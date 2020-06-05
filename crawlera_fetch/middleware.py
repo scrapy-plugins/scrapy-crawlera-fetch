@@ -56,6 +56,8 @@ class CrawleraFetchMiddleware:
 
         self.raise_on_error = crawler.settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR", True)
 
+        self.default_args = crawler.settings.getdict("CRAWLERA_FETCH_DEFAULT_ARGS", {})
+
         crawler.signals.connect(self.spider_closed, signal=scrapy.signals.spider_closed)
 
         self.crawler = crawler
@@ -94,6 +96,7 @@ class CrawleraFetchMiddleware:
         # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
         body = {"url": request.url, "method": request.method, "body": original_body_text}
+        body.update(self.default_args)
         body.update(crawlera_meta.get("args") or {})
         body_json = json.dumps(body)
 

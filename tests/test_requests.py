@@ -62,6 +62,26 @@ def test_process_request_single_download_slot():
             assert json.loads(processed_text) == json.loads(expected_text)
 
 
+@patch("time.time", mocked_time)
+def test_process_request_default_args():
+    middleware = get_test_middleware(
+        settings={"CRAWLERA_FETCH_DEFAULT_ARGS": {"foo": "bar", "answer": "42"}}
+    )
+
+    for case in deepcopy(test_requests):
+        original = case["original"]
+        processed = middleware.process_request(original, Spider("foo"))
+
+        crawlera_meta = original.meta.get("crawlera_fetch")
+        if crawlera_meta.get("skip"):
+            assert processed is None
+        else:
+            processed_text = processed.body.decode(processed.encoding)
+            processed_json = json.loads(processed_text)
+            assert processed_json["foo"] == "bar"
+            assert processed_json["answer"] == "42"
+
+
 @patch("scrapy.version_info", (1, 8, 0))
 def test_process_request_scrapy_1():
     from tests.utils import get_test_middleware

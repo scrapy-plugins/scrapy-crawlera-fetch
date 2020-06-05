@@ -60,6 +60,10 @@ Crawlera middleware won't be able to handle them.
     consider setting `SCHEDULER_PRIORITY_QUEUE="scrapy.pqueues.DownloaderAwarePriorityQueue"` to
     make better usage of concurrency options and avoid delays.
 
+* `CRAWLERA_FETCH_DEFAULT_ARGS` (type `dict`, default `{}`)
+    Default values to be sent to the Crawlera Fetch API. For instance, set to `{"device": "mobile"}`
+    to render all requests with a mobile profile.
+
 ### Log formatter
 
 Since the URL for outgoing requests is modified by the middleware, by default the logs will show
@@ -113,6 +117,9 @@ is translated into the following body:
 ```python
 '{"url": "https://example.org", "method": "GET", "body": "", "region": "us", "device": "mobile"}'
 ```
+
+Arguments set for a specific request through the `crawlera_fetch.args` key override those
+set with the `CRAWLERA_FETCH_DEFAULT_ARGS` setting.
 
 ### Accessing original request and raw Crawlera response
 
