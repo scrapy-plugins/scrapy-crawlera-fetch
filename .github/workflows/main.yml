@@ -45,3 +45,6 @@ jobs:
 
     - name: Run tests
       run: tox -e py${{ matrix.python-version }}
+
+    - name: Upload coverage report
+      run: bash <(curl -s https://codecov.io/bash)
