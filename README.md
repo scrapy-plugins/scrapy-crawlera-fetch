@@ -1,4 +1,6 @@
 # Scrapy Middleware for Crawlera Simple Fetch API
+[![actions](https://github.com/scrapy-plugins/scrapy-crawlera-fetch/workflows/Build/badge.svg)](https://github.com/scrapy-plugins/scrapy-crawlera-fetch/actions)
+[![codecov](https://codecov.io/gh/scrapy-plugins/scrapy-crawlera-fetch/branch/master/graph/badge.svg)](https://codecov.io/gh/scrapy-plugins/scrapy-crawlera-fetch)
 
 This package provides a Scrapy [Downloader Middleware](https://docs.scrapy.org/en/latest/topics/downloader-middleware.html)
 to transparently interact with the [Crawlera Fetch API](https://scrapinghub.atlassian.net/wiki/spaces/CRAWLERA/pages/889979197/Simple+Fetch+API).
