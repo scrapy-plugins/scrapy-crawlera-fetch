@@ -119,7 +119,9 @@ class CrawleraFetchMiddleware:
         request.headers.update(additional_headers)
 
         if scrapy.version_info < (2, 0, 0):
-            request.flags.append("original url: {}".format(request.url))
+            original_url_flag = f"original url: {request.url}"
+            if original_url_flag not in request.flags:
+                request.flags.append(original_url_flag)
 
         request.meta[META_KEY] = crawlera_meta
         return request.replace(url=self.url, method="POST", body=body_json)
