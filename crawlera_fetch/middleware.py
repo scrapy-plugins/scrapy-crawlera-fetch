@@ -142,17 +142,17 @@ class CrawleraFetchMiddleware:
             message = response.headers["X-Crawlera-Error"].decode("utf8")
             self.stats.inc_value("crawlera_fetch/response_error")
             self.stats.inc_value("crawlera_fetch/response_error/{}".format(message))
-            crawlera_error_args = (
-                "Error downloading <%s %s> (status: %i, X-Crawlera-Error header: %s)",
+            log_msg = "Error downloading <{} {}> (status: {}, X-Crawlera-Error header: {})"
+            log_msg = log_msg.format(
                 crawlera_meta["original_request"]["method"],
                 crawlera_meta["original_request"]["url"],
                 response.status,
                 message,
             )
             if self.raise_on_error:
-                raise CrawleraFetchException(*crawlera_error_args)
+                raise CrawleraFetchException(log_msg)
             else:
-                logger.error(*crawlera_error_args)
+                logger.error(log_msg)
                 return response
 
         try:
@@ -160,8 +160,8 @@ class CrawleraFetchMiddleware:
         except json.JSONDecodeError as exc:
             self.stats.inc_value("crawlera_fetch/response_error")
             self.stats.inc_value("crawlera_fetch/response_error/JSONDecodeError")
-            msg = "Error decoding <{} {}> (status: {}, message: {}, lineno: {}, colno: {})"
-            msg = msg.format(
+            log_msg = "Error decoding <{} {}> (status: {}, message: {}, lineno: {}, colno: {})"
+            log_msg = log_msg.format(
                 crawlera_meta["original_request"]["method"],
                 crawlera_meta["original_request"]["url"],
                 response.status,
@@ -170,9 +170,9 @@ class CrawleraFetchMiddleware:
                 exc.colno,
             )
             if self.raise_on_error:
-                raise CrawleraFetchException(msg) from exc
+                raise CrawleraFetchException(log_msg) from exc
             else:
-                logger.error(msg)
+                logger.error(log_msg)
                 return response
 
         self.stats.inc_value(
