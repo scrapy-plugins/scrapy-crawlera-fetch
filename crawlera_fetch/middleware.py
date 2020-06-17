@@ -191,7 +191,7 @@ class CrawleraFetchMiddleware:
         )
         return response.replace(
             cls=respcls,
-            request=request.replace(url="https://scrapinghub.com"),
+            request=request.replace(**crawlera_meta["original_request"]),
             headers=json_response["headers"],
             url=json_response["url"],
             body=json_response["body"],
