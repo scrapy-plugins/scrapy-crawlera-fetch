@@ -49,8 +49,8 @@ def test_stats(mocked_time):
     assert middleware.stats.get_value("crawlera_fetch/avg_latency") == avg_latency
     assert middleware.stats.get_value("crawlera_fetch/max_latency") == max_latency
     for status in set(status_list):
-        status_count = middleware.stats.get_value(f"crawlera_fetch/response_status_count/{status}")
-        assert status_count == status_list.count(status)
+        sc = middleware.stats.get_value("crawlera_fetch/response_status_count/{}".format(status))
+        assert sc == status_list.count(status)
     for method in set(method_list):
-        method_count = middleware.stats.get_value(f"crawlera_fetch/request_method_count/{method}")
-        assert method_count == method_list.count(method)
+        mc = middleware.stats.get_value("crawlera_fetch/request_method_count/{}".format(method))
+        assert mc == method_list.count(method)

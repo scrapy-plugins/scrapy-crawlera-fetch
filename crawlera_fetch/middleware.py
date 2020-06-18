@@ -119,7 +119,7 @@ class CrawleraFetchMiddleware:
         request.headers.update(additional_headers)
 
         if scrapy.version_info < (2, 0, 0):
-            original_url_flag = f"original url: {request.url}"
+            original_url_flag = "original url: {}".format(request.url)
             if original_url_flag not in request.flags:
                 request.flags.append(original_url_flag)
 

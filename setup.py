@@ -19,6 +19,7 @@ setuptools.setup(
         "Development Status :: 1 - Planning",
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -28,5 +29,6 @@ setuptools.setup(
         "Topic :: Software Development :: Libraries :: Application Frameworks",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
+    python_requires=">=3.5",
     install_requires=["scrapy>=1.6.0", "w3lib"],
 )

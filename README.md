@@ -8,7 +8,7 @@ to transparently interact with the [Crawlera Fetch API](https://scrapinghub.atla
 
 ## Requirements
 
-* Python 3.6+
+* Python 3.5+
 * Scrapy 1.6+
 
 
