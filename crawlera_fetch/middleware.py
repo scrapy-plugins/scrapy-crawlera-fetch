@@ -35,7 +35,7 @@ class CrawleraFetchException(Exception):
 
 class CrawleraFetchMiddleware:
 
-    url = "https://api.crawlera.com/fetch/v2"
+    url = "http://fetch.crawlera.com:8010/fetch/v2/"
     apikey = ""
 
     def __init__(self, crawler: Crawler) -> None:

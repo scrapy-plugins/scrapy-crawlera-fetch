@@ -2,8 +2,10 @@
 [![actions](https://github.com/scrapy-plugins/scrapy-crawlera-fetch/workflows/Build/badge.svg)](https://github.com/scrapy-plugins/scrapy-crawlera-fetch/actions)
 [![codecov](https://codecov.io/gh/scrapy-plugins/scrapy-crawlera-fetch/branch/master/graph/badge.svg)](https://codecov.io/gh/scrapy-plugins/scrapy-crawlera-fetch)
 
-This package provides a Scrapy [Downloader Middleware](https://docs.scrapy.org/en/latest/topics/downloader-middleware.html)
-to transparently interact with the [Crawlera Fetch API](https://scrapinghub.atlassian.net/wiki/spaces/CRAWLERA/pages/889979197/Simple+Fetch+API).
+This package provides a Scrapy
+[Downloader Middleware](https://docs.scrapy.org/en/latest/topics/downloader-middleware.html)
+to transparently interact with the
+[Crawlera Fetch API](https://doc.scrapinghub.com/crawlera-fetch-api.html).
 
 
 ## Requirements
@@ -25,7 +27,8 @@ or
 
 ## Configuration
 
-Enable the `CrawleraFetchMiddleware` via the [`DOWNLOADER_MIDDLEWARES`](https://docs.scrapy.org/en/latest/topics/settings.html#downloader-middlewares)
+Enable the `CrawleraFetchMiddleware` via the
+[`DOWNLOADER_MIDDLEWARES`](https://docs.scrapy.org/en/latest/topics/settings.html#downloader-middlewares)
 setting:
 
 ```
@@ -35,7 +38,7 @@ DOWNLOADER_MIDDLEWARES = {
 ```
 
 Please note that the middleware needs to be placed before the built-in `HttpCompressionMiddleware`
-middleware (which has a priority of 590) , otherwise incoming responses will be compressed and the
+middleware (which has a priority of 590), otherwise incoming responses will be compressed and the
 Crawlera middleware won't be able to handle them.
 
 ### Settings
@@ -46,7 +49,7 @@ Crawlera middleware won't be able to handle them.
 * `CRAWLERA_FETCH_APIKEY` (type `str`). API key to be used to authenticate against the Crawlera endpoint
     (mandatory if enabled)
 
-* `CRAWLERA_FETCH_URL` (Type `str`, default `"https://api.crawlera.com/fetch/v2"`).
+* `CRAWLERA_FETCH_URL` (Type `str`, default `"http://fetch.crawlera.com:8010/fetch/v2/"`).
     The endpoint of a specific Crawlera instance
 
 * `CRAWLERA_FETCH_RAISE_ON_ERROR` (type `bool`, default `True`). Whether or not the middleware will
@@ -123,7 +126,7 @@ set with the `CRAWLERA_FETCH_DEFAULT_ARGS` setting.
 
 ### Accessing original request and raw Crawlera response
 
-The `url`, `method`, `headers` and `body` attributes of the originalrequest are available under
+The `url`, `method`, `headers` and `body` attributes of the original request are available under
 the `crawlera_fetch.original_request` `Response.meta` key.
 
 The `status`, `headers` and `body` attributes of the upstream Crawlera response are available under
