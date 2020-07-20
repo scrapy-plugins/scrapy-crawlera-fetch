@@ -32,6 +32,7 @@ test_requests.append(
                 "Authorization": basic_auth_header(SETTINGS["CRAWLERA_FETCH_APIKEY"], ""),
                 "Content-Type": "application/json",
                 "Accept": "application/json",
+                "X-Crawlera-JobId": "1/2/3",
             },
             meta={
                 "crawlera_fetch": {
@@ -80,6 +81,7 @@ test_requests.append(
                 "Authorization": basic_auth_header(SETTINGS["CRAWLERA_FETCH_APIKEY"], ""),
                 "Content-Type": "application/json",
                 "Accept": "application/json",
+                "X-Crawlera-JobId": "1/2/3",
             },
             meta={
                 "crawlera_fetch": {

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 from enum import Enum
 from typing import Optional, Type, TypeVar
@@ -117,6 +118,8 @@ class CrawleraFetchMiddleware:
             "Accept": "application/json",
         }
         request.headers.update(additional_headers)
+        if os.environ.get("SHUB_JOBKEY"):
+            request.headers["X-Crawlera-JobId"] = os.environ["SHUB_JOBKEY"]
 
         if scrapy.version_info < (2, 0, 0):
             original_url_flag = "original url: {}".format(request.url)
