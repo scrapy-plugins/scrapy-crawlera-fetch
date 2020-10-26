@@ -210,7 +210,9 @@ class CrawleraFetchMiddleware:
             "body": json_response,
         }
         respcls = responsetypes.from_args(
-            headers=json_response["headers"], url=json_response["url"], body=json_response["body"],
+            headers=json_response["headers"],
+            url=json_response["url"],
+            body=json_response["body"],
         )
         return response.replace(
             cls=respcls,
