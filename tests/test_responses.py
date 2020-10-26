@@ -98,12 +98,18 @@ def test_process_response_error():
                     }
                 },
             ),
-            body=b'{"url":"https://example.org",'
-                 b'"original_status":503,"headers":{},'
-                 b'"crawlera_status":"fail",'
-                 b'"crawlera_error":"serverbusy",'
-                 b'"body_encoding":"plain",'
-                 b'"body":"Server busy: too many outstanding requests"}'
+            body=json.dumps(
+                {
+                    "url": "https://example.org",
+                    "original_status": 503,
+                    "headers": {},
+                    "crawlera_status": "fail",
+                    "crawlera_error": "serverbusy",
+                    "body_encoding": "plain",
+                    "body": "Server busy: too many outstanding requests",
+                }
+            ),
+            encoding="utf8",
         ),
     ]
 
