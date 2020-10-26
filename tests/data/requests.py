@@ -111,7 +111,9 @@ test_requests.append(
 test_requests.append(
     {
         "original": Request(
-            url="https://example.org", method="HEAD", meta={"crawlera_fetch": {"skip": True}},
+            url="https://example.org",
+            method="HEAD",
+            meta={"crawlera_fetch": {"skip": True}},
         ),
         "expected": None,
     }

@@ -87,6 +87,30 @@ def test_process_response_error():
             ),
             body=b'{"Bad": "JSON',
         ),
+        TextResponse(
+            url="https://crawlera.com/fake/api/endpoint",
+            request=Request(
+                url="https://crawlera.com/fake/api/endpoint",
+                meta={
+                    "crawlera_fetch": {
+                        "timing": {"start_ts": mocked_time()},
+                        "original_request": {"url": "https://example.org", "method": "GET"},
+                    }
+                },
+            ),
+            body=json.dumps(
+                {
+                    "url": "https://example.org",
+                    "original_status": 503,
+                    "headers": {},
+                    "crawlera_status": "fail",
+                    "crawlera_error": "serverbusy",
+                    "body_encoding": "plain",
+                    "body": "Server busy: too many outstanding requests",
+                }
+            ),
+            encoding="utf8",
+        ),
     ]
 
     middleware_raise = get_test_middleware(settings={"CRAWLERA_FETCH_RAISE_ON_ERROR": True})
@@ -94,9 +118,10 @@ def test_process_response_error():
         with pytest.raises(CrawleraFetchException):
             middleware_raise.process_response(response.request, response, Spider("foo"))
 
-    assert middleware_raise.stats.get_value("crawlera_fetch/response_error") == 2
+    assert middleware_raise.stats.get_value("crawlera_fetch/response_error") == 3
     assert middleware_raise.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
     assert middleware_raise.stats.get_value("crawlera_fetch/response_error/JSONDecodeError") == 1
+    assert middleware_raise.stats.get_value("crawlera_fetch/response_error/serverbusy") == 1
 
     middleware_log = get_test_middleware(settings={"CRAWLERA_FETCH_RAISE_ON_ERROR": False})
     with LogCapture() as logs:
@@ -115,8 +140,14 @@ def test_process_response_error():
             "ERROR",
             "Error decoding <GET https://example.org> (status: 200, message: Unterminated string starting at, lineno: 1, colno: 9)",  # noqa: E501
         ),
+        (
+            "crawlera-fetch-middleware",
+            "ERROR",
+            "Error downloading <GET https://example.org> (Original status: 503, Fetch API error message: Server busy: too many outstanding requests)",  # noqa: E501
+        ),
     )
 
-    assert middleware_log.stats.get_value("crawlera_fetch/response_error") == 2
+    assert middleware_log.stats.get_value("crawlera_fetch/response_error") == 3
     assert middleware_log.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
     assert middleware_log.stats.get_value("crawlera_fetch/response_error/JSONDecodeError") == 1
+    assert middleware_log.stats.get_value("crawlera_fetch/response_error/serverbusy") == 1

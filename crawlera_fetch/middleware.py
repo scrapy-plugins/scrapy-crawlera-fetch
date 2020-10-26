@@ -180,6 +180,26 @@ class CrawleraFetchMiddleware:
                 logger.error(log_msg)
                 return response
 
+        if json_response.get("crawlera_error"):
+            error = json_response["crawlera_error"]
+            message = json_response["body"]
+            self.stats.inc_value("crawlera_fetch/response_error")
+            self.stats.inc_value("crawlera_fetch/response_error/{}".format(error))
+            log_msg = (
+                "Error downloading <{} {}> (Original status: {}, Fetch API error message: {})"
+            )
+            log_msg = log_msg.format(
+                crawlera_meta["original_request"]["method"],
+                crawlera_meta["original_request"]["url"],
+                json_response["original_status"],
+                message,
+            )
+            if self.raise_on_error:
+                raise CrawleraFetchException(log_msg)
+            else:
+                logger.error(log_msg)
+                return response
+
         self.stats.inc_value(
             "crawlera_fetch/response_status_count/{}".format(json_response["original_status"])
         )
@@ -190,7 +210,9 @@ class CrawleraFetchMiddleware:
             "body": json_response,
         }
         respcls = responsetypes.from_args(
-            headers=json_response["headers"], url=json_response["url"], body=json_response["body"],
+            headers=json_response["headers"],
+            url=json_response["url"],
+            body=json_response["body"],
         )
         return response.replace(
             cls=respcls,
