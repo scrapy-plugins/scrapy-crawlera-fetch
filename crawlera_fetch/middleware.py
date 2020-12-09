@@ -12,6 +12,7 @@ from scrapy.http.request import Request
 from scrapy.http.response import Response
 from scrapy.responsetypes import responsetypes
 from scrapy.spiders import Spider
+from scrapy.utils.reqser import request_from_dict, request_to_dict
 from w3lib.http import basic_auth_header
 
 
@@ -102,12 +103,7 @@ class CrawleraFetchMiddleware:
         body_json = json.dumps(body)
 
         additional_meta = {
-            "original_request": {
-                "url": request.url,
-                "method": request.method,
-                "headers": dict(request.headers),
-                "body": request.body,
-            },
+            "original_request": request_to_dict(request),
             "timing": {"start_ts": time.time()},
         }
         crawlera_meta.update(additional_meta)
@@ -138,6 +134,8 @@ class CrawleraFetchMiddleware:
         if crawlera_meta.get("skip") or not crawlera_meta.get("original_request"):
             return response
 
+        original_request = request_from_dict(crawlera_meta["original_request"])
+
         self.stats.inc_value("crawlera_fetch/response_count")
         self._calculate_latency(request)
 
@@ -149,8 +147,8 @@ class CrawleraFetchMiddleware:
             self.stats.inc_value("crawlera_fetch/response_error/{}".format(message))
             log_msg = "Error downloading <{} {}> (status: {}, X-Crawlera-Error header: {})"
             log_msg = log_msg.format(
-                crawlera_meta["original_request"]["method"],
-                crawlera_meta["original_request"]["url"],
+                original_request.method,
+                original_request.url,
                 response.status,
                 message,
             )
@@ -167,8 +165,8 @@ class CrawleraFetchMiddleware:
             self.stats.inc_value("crawlera_fetch/response_error/JSONDecodeError")
             log_msg = "Error decoding <{} {}> (status: {}, message: {}, lineno: {}, colno: {})"
             log_msg = log_msg.format(
-                crawlera_meta["original_request"]["method"],
-                crawlera_meta["original_request"]["url"],
+                original_request.method,
+                original_request.url,
                 response.status,
                 exc.msg,
                 exc.lineno,
@@ -189,8 +187,8 @@ class CrawleraFetchMiddleware:
                 "Error downloading <{} {}> (Original status: {}, Fetch API error message: {})"
             )
             log_msg = log_msg.format(
-                crawlera_meta["original_request"]["method"],
-                crawlera_meta["original_request"]["url"],
+                original_request.method,
+                original_request.url,
                 json_response["original_status"],
                 message,
             )
@@ -216,7 +214,7 @@ class CrawleraFetchMiddleware:
         )
         return response.replace(
             cls=respcls,
-            request=request.replace(**crawlera_meta["original_request"]),
+            request=original_request,
             headers=json_response["headers"],
             url=json_response["url"],
             body=json_response["body"],

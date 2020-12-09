@@ -1,12 +1,14 @@
 import json
 
 import pytest
-from scrapy import Spider, Request
+from scrapy import Request
 from scrapy.http.response.text import TextResponse
+from scrapy.utils.reqser import request_to_dict
 from testfixtures import LogCapture
 
 from crawlera_fetch.middleware import CrawleraFetchException
 
+from tests.data import dummy_spider
 from tests.data.responses import test_responses
 from tests.utils import get_test_middleware, mocked_time
 
@@ -18,7 +20,7 @@ def test_process_response():
         original = case["original"]
         expected = case["expected"]
 
-        processed = middleware.process_response(original.request, original, Spider("foo"))
+        processed = middleware.process_response(original.request, original, dummy_spider)
 
         assert type(processed) is type(expected)
         assert processed.url == expected.url
@@ -42,12 +44,15 @@ def test_process_response_skip():
             "Transfer-Encoding": "chunked",
             "Date": "Fri, 24 Apr 2020 18:06:42 GMT",
         },
-        request=Request(url="https://example.org", meta={"crawlera_fetch": {"skip": True}}),
+        request=Request(
+            url="https://example.org",
+            meta={"crawlera_fetch": {"skip": True}},
+        ),
         body=b"""<html></html>""",
     )
 
     middleware = get_test_middleware()
-    processed = middleware.process_response(response.request, response, Spider("foo"))
+    processed = middleware.process_response(response.request, response, dummy_spider)
 
     assert response is processed
 
@@ -61,7 +66,10 @@ def test_process_response_error():
                 meta={
                     "crawlera_fetch": {
                         "timing": {"start_ts": mocked_time()},
-                        "original_request": {"url": "https://example.org", "method": "GET"},
+                        "original_request": request_to_dict(
+                            Request("https://example.org"),
+                            spider=dummy_spider,
+                        ),
                     }
                 },
             ),
@@ -81,7 +89,10 @@ def test_process_response_error():
                 meta={
                     "crawlera_fetch": {
                         "timing": {"start_ts": mocked_time()},
-                        "original_request": {"url": "https://example.org", "method": "GET"},
+                        "original_request": request_to_dict(
+                            Request("https://example.org"),
+                            spider=dummy_spider,
+                        ),
                     }
                 },
             ),
@@ -94,7 +105,10 @@ def test_process_response_error():
                 meta={
                     "crawlera_fetch": {
                         "timing": {"start_ts": mocked_time()},
-                        "original_request": {"url": "https://example.org", "method": "GET"},
+                        "original_request": request_to_dict(
+                            Request("https://example.org"),
+                            spider=dummy_spider,
+                        ),
                     }
                 },
             ),
@@ -116,7 +130,7 @@ def test_process_response_error():
     middleware_raise = get_test_middleware(settings={"CRAWLERA_FETCH_RAISE_ON_ERROR": True})
     for response in response_list:
         with pytest.raises(CrawleraFetchException):
-            middleware_raise.process_response(response.request, response, Spider("foo"))
+            middleware_raise.process_response(response.request, response, dummy_spider)
 
     assert middleware_raise.stats.get_value("crawlera_fetch/response_error") == 3
     assert middleware_raise.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
@@ -126,7 +140,7 @@ def test_process_response_error():
     middleware_log = get_test_middleware(settings={"CRAWLERA_FETCH_RAISE_ON_ERROR": False})
     with LogCapture() as logs:
         for response in response_list:
-            processed = middleware_log.process_response(response.request, response, Spider("foo"))
+            processed = middleware_log.process_response(response.request, response, dummy_spider)
             assert response is processed
 
     logs.check_present(

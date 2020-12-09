@@ -1,8 +1,9 @@
 from scrapy.http.request import Request
 from scrapy.http.response.html import HtmlResponse
 from scrapy.http.response.text import TextResponse
+from scrapy.utils.reqser import request_to_dict
 
-from tests.data import SETTINGS
+from tests.data import dummy_spider, SETTINGS
 from tests.utils import mocked_time
 
 
@@ -22,11 +23,14 @@ test_responses.append(
                 "Connection": "close",
             },
             request=Request(
-                SETTINGS["CRAWLERA_FETCH_URL"],
+                url=SETTINGS["CRAWLERA_FETCH_URL"],
                 meta={
                     "crawlera_fetch": {
                         "timing": {"start_ts": mocked_time()},
-                        "original_request": {"url": "https://fake.host.com"},
+                        "original_request": request_to_dict(
+                            Request("https://fake.host.com"),
+                            spider=dummy_spider,
+                        ),
                     }
                 },
             ),
@@ -55,11 +59,14 @@ test_responses.append(
                 "Connection": "close",
             },
             request=Request(
-                SETTINGS["CRAWLERA_FETCH_URL"],
+                url=SETTINGS["CRAWLERA_FETCH_URL"],
                 meta={
                     "crawlera_fetch": {
                         "timing": {"start_ts": mocked_time()},
-                        "original_request": {"url": "https://httpbin.org/get"},
+                        "original_request": request_to_dict(
+                            Request("https://httpbin.org/get"),
+                            spider=dummy_spider,
+                        ),
                     }
                 },
             ),
@@ -98,11 +105,14 @@ test_responses.append(
                 "Connection": "close",
             },
             request=Request(
-                SETTINGS["CRAWLERA_FETCH_URL"],
+                url=SETTINGS["CRAWLERA_FETCH_URL"],
                 meta={
                     "crawlera_fetch": {
                         "timing": {"start_ts": mocked_time()},
-                        "original_request": {"url": "https://example.org"},
+                        "original_request": request_to_dict(
+                            Request("https://example.org"),
+                            spider=dummy_spider,
+                        ),
                     }
                 },
             ),
@@ -133,7 +143,7 @@ test_responses.append(
     }
 )
 
-non_processed = HtmlResponse(
+unprocessed = HtmlResponse(
     url="https://example.org",
     status=200,
     headers={
@@ -145,4 +155,4 @@ non_processed = HtmlResponse(
     request=Request("https://example.org"),
     body=b"""<html></html>""",
 )
-test_responses.append({"original": non_processed, "expected": non_processed})
+test_responses.append({"original": unprocessed, "expected": unprocessed})
