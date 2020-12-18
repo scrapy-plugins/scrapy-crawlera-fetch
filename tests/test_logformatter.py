@@ -1,5 +1,4 @@
 import unittest
-from copy import deepcopy
 from logging import LogRecord, Formatter
 
 from scrapy import version_info as scrapy_version
@@ -8,7 +7,7 @@ from twisted.python.failure import Failure
 
 from crawlera_fetch.logformatter import CrawleraFetchLogFormatter
 
-from tests.data.requests import test_requests
+from tests.data.requests import get_test_requests
 from tests.utils import foo_spider, get_test_middleware
 
 
@@ -18,7 +17,7 @@ def test_log_formatter_scrapy_1():
     logformatter = CrawleraFetchLogFormatter()
     formatter = Formatter()
 
-    for case in deepcopy(test_requests):
+    for case in get_test_requests():
         original = case["original"]
         response = Response(original.url)
         processed = middleware.process_request(original, foo_spider)
@@ -45,7 +44,7 @@ def test_log_formatter_scrapy_2():
     logformatter = CrawleraFetchLogFormatter()
     formatter = Formatter()
 
-    for case in deepcopy(test_requests):
+    for case in get_test_requests():
         original = case["original"]
         response = Response(original.url)
         processed = middleware.process_request(original, foo_spider)

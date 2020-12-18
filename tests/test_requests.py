@@ -1,14 +1,13 @@
 import json
 import os
 from contextlib import contextmanager
-from copy import deepcopy
 from unittest.mock import patch
 
 from scrapy import Request
 
 from crawlera_fetch import DownloadSlotPolicy
 
-from tests.data.requests import test_requests
+from tests.data.requests import get_test_requests
 from tests.utils import foo_spider, get_test_middleware, mocked_time
 
 
@@ -28,7 +27,7 @@ def shub_jobkey_env_variable():
 def test_process_request():
     middleware = get_test_middleware()
 
-    for case in deepcopy(test_requests):
+    for case in get_test_requests():
         original = case["original"]
         expected = case["expected"]
 
@@ -55,7 +54,7 @@ def test_process_request_single_download_slot():
         settings={"CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY": DownloadSlotPolicy.Single}
     )
 
-    for case in deepcopy(test_requests):
+    for case in get_test_requests():
         original = case["original"]
         expected = case["expected"]
         if expected:
@@ -84,7 +83,7 @@ def test_process_request_default_args():
         settings={"CRAWLERA_FETCH_DEFAULT_ARGS": {"foo": "bar", "answer": "42"}}
     )
 
-    for case in deepcopy(test_requests):
+    for case in get_test_requests():
         original = case["original"]
         processed = middleware.process_request(original, foo_spider)
 

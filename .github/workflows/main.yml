@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set up py3.8
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: 3.8
 
@@ -30,13 +30,13 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
 
     - name: Set up py${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -44,7 +44,27 @@ jobs:
       run: pip install tox
 
     - name: Run tests
-      run: tox -e py${{ matrix.python-version }}
+      run: tox -e py
+
+    - name: Upload coverage report
+      run: bash <(curl -s https://codecov.io/bash)
+
+  tests-py35-pinned:
+    runs-on: ubuntu-18.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up py35
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.5
+
+    - name: Install tox
+      run: pip install tox
+
+    - name: Run tests
+      run: tox -e py35-pinned
 
     - name: Upload coverage report
       run: bash <(curl -s https://codecov.io/bash)
