@@ -63,14 +63,18 @@ def test_log_formatter_scrapy_2():
         assert logstr == "Crawled (200) %s (referer: None)" % str(original)
 
         # spider_error
-        result = logformatter.spider_error(Failure(Exception("exc")), processed, response, foo_spider)
+        result = logformatter.spider_error(
+            Failure(Exception("exc")), processed, response, foo_spider
+        )
         assert result["args"]["request"] == str(original)
         record = LogRecord(name="logger", pathname="n/a", lineno=1, exc_info=None, **result)
         logstr = formatter.format(record)
         assert logstr == "Spider error processing %s (referer: None)" % str(original)
 
         # download_error
-        result = logformatter.download_error(Failure(Exception("exc")), processed, foo_spider, "error")
+        result = logformatter.download_error(
+            Failure(Exception("exc")), processed, foo_spider, "error"
+        )
         assert result["args"]["request"] == str(original)
         record = LogRecord(name="logger", pathname="n/a", lineno=2, exc_info=None, **result)
         logstr = formatter.format(record)
