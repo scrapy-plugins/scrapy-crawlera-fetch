@@ -4,8 +4,8 @@ from scrapy import Request, FormRequest
 from scrapy.utils.reqser import request_to_dict
 from w3lib.http import basic_auth_header
 
-from tests.data import dummy_spider, SETTINGS
-from tests.utils import mocked_time
+from tests.data import SETTINGS
+from tests.utils import foo_spider, mocked_time
 
 
 test_requests = []
@@ -26,6 +26,7 @@ original1 = Request(
 )
 expected1 = Request(
     url=SETTINGS["CRAWLERA_FETCH_URL"],
+    callback=foo_spider.foo_callback,
     method="POST",
     headers={
         "Authorization": basic_auth_header(SETTINGS["CRAWLERA_FETCH_APIKEY"], ""),
@@ -41,7 +42,7 @@ expected1 = Request(
                 "iptype": "datacenter",
                 "device": "mobile",
             },
-            "original_request": request_to_dict(original1, spider=dummy_spider),
+            "original_request": request_to_dict(original1, spider=foo_spider),
             "timing": {"start_ts": mocked_time()},
         },
         "download_slot": "httpbin.org",
@@ -68,6 +69,7 @@ test_requests.append(
 
 original2 = FormRequest(
     url="https://httpbin.org/post",
+    callback=foo_spider.foo_callback,
     meta={"crawlera_fetch": {"args": {"device": "desktop"}}},
     formdata={"foo": "bar"},
 )
@@ -83,7 +85,7 @@ expected2 = FormRequest(
     meta={
         "crawlera_fetch": {
             "args": {"device": "desktop"},
-            "original_request": request_to_dict(original2, spider=dummy_spider),
+            "original_request": request_to_dict(original2, spider=foo_spider),
             "timing": {"start_ts": mocked_time()},
         },
         "download_slot": "httpbin.org",

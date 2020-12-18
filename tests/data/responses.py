@@ -3,8 +3,8 @@ from scrapy.http.response.html import HtmlResponse
 from scrapy.http.response.text import TextResponse
 from scrapy.utils.reqser import request_to_dict
 
-from tests.data import dummy_spider, SETTINGS
-from tests.utils import mocked_time
+from tests.data import SETTINGS
+from tests.utils import foo_spider, mocked_time
 
 
 test_responses = []
@@ -29,7 +29,7 @@ test_responses.append(
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://fake.host.com"),
-                            spider=dummy_spider,
+                            spider=foo_spider,
                         ),
                     }
                 },
@@ -65,7 +65,7 @@ test_responses.append(
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://httpbin.org/get"),
-                            spider=dummy_spider,
+                            spider=foo_spider,
                         ),
                     }
                 },
@@ -111,7 +111,7 @@ test_responses.append(
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://example.org"),
-                            spider=dummy_spider,
+                            spider=foo_spider,
                         ),
                     }
                 },
