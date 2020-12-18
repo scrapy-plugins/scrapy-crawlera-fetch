@@ -103,7 +103,7 @@ class CrawleraFetchMiddleware:
         body_json = json.dumps(body)
 
         additional_meta = {
-            "original_request": request_to_dict(request),
+            "original_request": request_to_dict(request, spider=spider),
             "timing": {"start_ts": time.time()},
         }
         crawlera_meta.update(additional_meta)
@@ -134,7 +134,7 @@ class CrawleraFetchMiddleware:
         if crawlera_meta.get("skip") or not crawlera_meta.get("original_request"):
             return response
 
-        original_request = request_from_dict(crawlera_meta["original_request"])
+        original_request = request_from_dict(crawlera_meta["original_request"], spider=spider)
 
         self.stats.inc_value("crawlera_fetch/response_count")
         self._calculate_latency(request)
