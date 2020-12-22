@@ -66,7 +66,7 @@ class CrawleraFetchMiddleware:
         self.stats = crawler.stats
         self.total_latency = 0
 
-        logger.debug(
+        logger.info(
             "Using Crawlera Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
         )
 
