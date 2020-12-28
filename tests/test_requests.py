@@ -1,16 +1,14 @@
 import json
 import os
 from contextlib import contextmanager
-from copy import deepcopy
 from unittest.mock import patch
 
 from scrapy import Request
 
 from crawlera_fetch import DownloadSlotPolicy
 
-from tests.data import dummy_spider
-from tests.data.requests import test_requests
-from tests.utils import get_test_middleware, mocked_time
+from tests.data.requests import get_test_requests
+from tests.utils import foo_spider, get_test_middleware, mocked_time
 
 
 @contextmanager
@@ -29,12 +27,12 @@ def shub_jobkey_env_variable():
 def test_process_request():
     middleware = get_test_middleware()
 
-    for case in deepcopy(test_requests):
+    for case in get_test_requests():
         original = case["original"]
         expected = case["expected"]
 
         with shub_jobkey_env_variable():
-            processed = middleware.process_request(original, dummy_spider)
+            processed = middleware.process_request(original, foo_spider)
 
         crawlera_meta = original.meta.get("crawlera_fetch")
         if crawlera_meta.get("skip"):
@@ -56,14 +54,14 @@ def test_process_request_single_download_slot():
         settings={"CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY": DownloadSlotPolicy.Single}
     )
 
-    for case in deepcopy(test_requests):
+    for case in get_test_requests():
         original = case["original"]
         expected = case["expected"]
         if expected:
             expected.meta["download_slot"] = "__crawlera_fetch__"
 
         with shub_jobkey_env_variable():
-            processed = middleware.process_request(original, dummy_spider)
+            processed = middleware.process_request(original, foo_spider)
 
         crawlera_meta = original.meta.get("crawlera_fetch")
         if crawlera_meta.get("skip"):
@@ -85,9 +83,9 @@ def test_process_request_default_args():
         settings={"CRAWLERA_FETCH_DEFAULT_ARGS": {"foo": "bar", "answer": "42"}}
     )
 
-    for case in deepcopy(test_requests):
+    for case in get_test_requests():
         original = case["original"]
-        processed = middleware.process_request(original, dummy_spider)
+        processed = middleware.process_request(original, foo_spider)
 
         crawlera_meta = original.meta.get("crawlera_fetch")
         if crawlera_meta.get("skip"):
@@ -106,5 +104,5 @@ def test_process_request_scrapy_1():
     middleware = get_test_middleware()
     request = Request("https://example.org")
     with shub_jobkey_env_variable():
-        processed = middleware.process_request(request, dummy_spider)
+        processed = middleware.process_request(request, foo_spider)
     assert processed.flags == ["original url: https://example.org"]

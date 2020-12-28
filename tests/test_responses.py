@@ -8,9 +8,8 @@ from testfixtures import LogCapture
 
 from crawlera_fetch.middleware import CrawleraFetchException
 
-from tests.data import dummy_spider
 from tests.data.responses import test_responses
-from tests.utils import get_test_middleware, mocked_time
+from tests.utils import foo_spider, get_test_middleware, mocked_time
 
 
 def test_process_response():
@@ -20,7 +19,7 @@ def test_process_response():
         original = case["original"]
         expected = case["expected"]
 
-        processed = middleware.process_response(original.request, original, dummy_spider)
+        processed = middleware.process_response(original.request, original, foo_spider)
 
         assert type(processed) is type(expected)
         assert processed.url == expected.url
@@ -52,7 +51,7 @@ def test_process_response_skip():
     )
 
     middleware = get_test_middleware()
-    processed = middleware.process_response(response.request, response, dummy_spider)
+    processed = middleware.process_response(response.request, response, foo_spider)
 
     assert response is processed
 
@@ -68,7 +67,7 @@ def test_process_response_error():
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://example.org"),
-                            spider=dummy_spider,
+                            spider=foo_spider,
                         ),
                     }
                 },
@@ -91,7 +90,7 @@ def test_process_response_error():
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://example.org"),
-                            spider=dummy_spider,
+                            spider=foo_spider,
                         ),
                     }
                 },
@@ -107,7 +106,7 @@ def test_process_response_error():
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://example.org"),
-                            spider=dummy_spider,
+                            spider=foo_spider,
                         ),
                     }
                 },
@@ -130,7 +129,7 @@ def test_process_response_error():
     middleware_raise = get_test_middleware(settings={"CRAWLERA_FETCH_RAISE_ON_ERROR": True})
     for response in response_list:
         with pytest.raises(CrawleraFetchException):
-            middleware_raise.process_response(response.request, response, dummy_spider)
+            middleware_raise.process_response(response.request, response, foo_spider)
 
     assert middleware_raise.stats.get_value("crawlera_fetch/response_error") == 3
     assert middleware_raise.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
@@ -140,7 +139,7 @@ def test_process_response_error():
     middleware_log = get_test_middleware(settings={"CRAWLERA_FETCH_RAISE_ON_ERROR": False})
     with LogCapture() as logs:
         for response in response_list:
-            processed = middleware_log.process_response(response.request, response, dummy_spider)
+            processed = middleware_log.process_response(response.request, response, foo_spider)
             assert response is processed
 
     logs.check_present(

@@ -24,6 +24,12 @@ class MockEngine:
 class FooSpider(Spider):
     name = "foo"
 
+    def foo_callback(self, response):
+        pass
+
+
+foo_spider = FooSpider()
+
 
 def get_test_middleware(settings=None):
     settings_dict = SETTINGS.copy()
