@@ -155,7 +155,7 @@ class CrawleraFetchMiddleware:
             if self.raise_on_error:
                 raise CrawleraFetchException(log_msg)
             else:
-                logger.error(log_msg)
+                logger.warning(log_msg)
                 return response
 
         try:
@@ -175,7 +175,7 @@ class CrawleraFetchMiddleware:
             if self.raise_on_error:
                 raise CrawleraFetchException(log_msg) from exc
             else:
-                logger.error(log_msg)
+                logger.warning(log_msg)
                 return response
 
         if json_response.get("crawlera_error"):
@@ -195,7 +195,7 @@ class CrawleraFetchMiddleware:
             if self.raise_on_error:
                 raise CrawleraFetchException(log_msg)
             else:
-                logger.error(log_msg)
+                logger.warning(log_msg)
                 return response
 
         self.stats.inc_value(
