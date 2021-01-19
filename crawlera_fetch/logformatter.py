@@ -25,7 +25,7 @@ class CrawleraFetchLogFormatter(LogFormatter):
     def _set_target_url(self, result: dict, request: Request) -> dict:
         with suppress(json.decoder.JSONDecodeError):
             payload = json.loads(request.body.decode(request.encoding))
-            result["args"]["request"] = "<%s %s>" % (payload["method"], payload["url"])
+            result["args"]["request"] = "<%s %s>" % (payload.get("method", "GET"), payload["url"])
         return result
 
     def crawled(self, request: Request, response: Response, spider: Spider) -> dict:

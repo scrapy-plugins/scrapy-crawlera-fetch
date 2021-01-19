@@ -51,7 +51,6 @@ def get_test_requests():
         body=json.dumps(
             {
                 "url": "https://httpbin.org/anything",
-                "method": "GET",
                 "body": "",
                 "render": "no",
                 "region": "us",
