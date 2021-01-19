@@ -98,8 +98,8 @@ class CrawleraFetchMiddleware:
         # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
         body = {"url": request.url, "body": original_body_text}
-        if request.method != 'GET':
-            body['method'] = request.method
+        if request.method != "GET":
+            body["method"] = request.method
         body.update(self.default_args)
         body.update(crawlera_meta.get("args") or {})
         body_json = json.dumps(body)
