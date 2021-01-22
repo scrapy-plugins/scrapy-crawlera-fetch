@@ -14,6 +14,8 @@ from scrapy.responsetypes import responsetypes
 from scrapy.spiders import Spider
 from scrapy.utils.reqser import request_from_dict, request_to_dict
 from w3lib.http import basic_auth_header
+import base64
+import binascii
 
 
 logger = logging.getLogger("crawlera-fetch-middleware")
@@ -43,9 +45,9 @@ class CrawleraFetchMiddleware:
     def __init__(self, crawler: Crawler) -> None:
         if not crawler.settings.getbool("CRAWLERA_FETCH_ENABLED"):
             raise NotConfigured()
-        elif not crawler.settings.get("CRAWLERA_FETCH_APIKEY"):
+        elif crawler.settings.get("CRAWLERA_FETCH_APIKEY") is None:
             raise NotConfigured("Crawlera Fetch API cannot be used without an apikey")
-        else:
+        elif crawler.settings.get("CRAWLERA_FETCH_APIKEY"):
             self.apikey = crawler.settings["CRAWLERA_FETCH_APIKEY"]
             self.auth_header = basic_auth_header(self.apikey, "")
 
@@ -109,10 +111,11 @@ class CrawleraFetchMiddleware:
         crawlera_meta.update(additional_meta)
 
         additional_headers = {
-            "Authorization": self.auth_header,
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+        if self.apikey:
+            additional_headers["Authorization"] = self.auth_header
         request.headers.update(additional_headers)
         if os.environ.get("SHUB_JOBKEY"):
             request.headers["X-Crawlera-JobId"] = os.environ["SHUB_JOBKEY"]
@@ -178,19 +181,23 @@ class CrawleraFetchMiddleware:
                 logger.warning(log_msg)
                 return response
 
-        if json_response.get("crawlera_error"):
-            error = json_response["crawlera_error"]
-            message = json_response["body"]
+        server_error = json_response.get("crawlera_error") or json_response.get("error_code")
+        original_status = json_response.get("original_status", response.status)
+        request_id = json_response.get("id") or json_response.get("uncork_id")
+        if server_error:
+            message = json_response.get("body") or json_response.get("message")
             self.stats.inc_value("crawlera_fetch/response_error")
-            self.stats.inc_value("crawlera_fetch/response_error/{}".format(error))
+            self.stats.inc_value("crawlera_fetch/response_error/{}".format(server_error))
             log_msg = (
-                "Error downloading <{} {}> (Original status: {}, Fetch API error message: {})"
+                "Error downloading <{} {}> (Original status: {}, Fetch API error message: {}). "
+                "Request ID: {}"
             )
             log_msg = log_msg.format(
                 original_request.method,
                 original_request.url,
-                json_response["original_status"],
+                original_status,
                 message,
+                request_id
             )
             if self.raise_on_error:
                 raise CrawleraFetchException(log_msg)
@@ -199,7 +206,7 @@ class CrawleraFetchMiddleware:
                 return response
 
         self.stats.inc_value(
-            "crawlera_fetch/response_status_count/{}".format(json_response["original_status"])
+            "crawlera_fetch/response_status_count/{}".format(original_status)
         )
 
         crawlera_meta["upstream_response"] = {
@@ -207,18 +214,23 @@ class CrawleraFetchMiddleware:
             "headers": response.headers,
             "body": json_response,
         }
+        try:
+            resp_body = base64.b64decode(json_response["body"], validate=True)
+        except (binascii.Error, ValueError):
+            resp_body = json_response["body"]
+
         respcls = responsetypes.from_args(
             headers=json_response["headers"],
             url=json_response["url"],
-            body=json_response["body"],
+            body=resp_body,
         )
         return response.replace(
             cls=respcls,
             request=original_request,
             headers=json_response["headers"],
             url=json_response["url"],
-            body=json_response["body"],
-            status=json_response["original_status"],
+            body=resp_body,
+            status=original_status,
         )
 
     def _set_download_slot(self, request, spider):

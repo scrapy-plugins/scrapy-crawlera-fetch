@@ -5,6 +5,8 @@ from scrapy.utils.reqser import request_to_dict
 
 from tests.data import SETTINGS
 from tests.utils import foo_spider, mocked_time
+import json
+import base64
 
 
 test_responses = []
@@ -156,3 +158,52 @@ unprocessed = HtmlResponse(
     body=b"""<html></html>""",
 )
 test_responses.append({"original": unprocessed, "expected": unprocessed})
+
+response_body_test = b'<html>Hello middleware test!</html>'
+test_responses.append({
+        "original": HtmlResponse(
+            url=SETTINGS["CRAWLERA_FETCH_URL"],
+            status=200,
+            headers={
+                "Content-Type": "application/json",
+                "Content-Encoding": "gzip",
+                "Date": "Fri, 24 Apr 2020 18:22:10 GMT",
+            },
+            request=Request(
+                url=SETTINGS["CRAWLERA_FETCH_URL"],
+                meta={
+                    "crawlera_fetch": {
+                        "timing": {"start_ts": mocked_time()},
+                        "original_request": request_to_dict(
+                            Request("http://httpbin.org/ip"),
+                            spider=foo_spider,
+                        ),
+                    }
+                },
+            ),
+            body=json.dumps(
+                {
+                    "id": "8498642e-1de3-40dd-b32f-f6eb6131e45e",
+                    "body": base64.b64encode(response_body_test).decode(),
+                    "original_status": 200, "url": "http://httpbin.org/ip", "original_url": "http://httpbin.org/ip",
+                    "headers": {
+                        "Content-Encoding": "gzip",
+                        "Content-Type": "text/html",
+                        "Date": "Fri, 24 Apr 2020 18:06:42 GMT"
+                    }
+                }
+            ).encode()
+        ),
+        "expected": HtmlResponse(
+            url="http://httpbin.org/ip",
+            status=200,
+            headers={
+                "content-encoding": "gzip",
+                "content-type": "text/html",
+                "date": "Fri, 24 Apr 2020 18:06:42 GMT",
+            },
+            body=response_body_test,
+        ),
+    }
+)
+
