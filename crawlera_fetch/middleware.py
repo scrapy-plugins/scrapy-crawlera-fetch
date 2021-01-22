@@ -197,7 +197,7 @@ class CrawleraFetchMiddleware:
                 original_request.url,
                 original_status,
                 message,
-                request_id
+                request_id,
             )
             if self.raise_on_error:
                 raise CrawleraFetchException(log_msg)
@@ -205,9 +205,7 @@ class CrawleraFetchMiddleware:
                 logger.warning(log_msg)
                 return response
 
-        self.stats.inc_value(
-            "crawlera_fetch/response_status_count/{}".format(original_status)
-        )
+        self.stats.inc_value("crawlera_fetch/response_status_count/{}".format(original_status))
 
         crawlera_meta["upstream_response"] = {
             "status": response.status,

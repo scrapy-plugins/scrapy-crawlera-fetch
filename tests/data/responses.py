@@ -159,8 +159,9 @@ unprocessed = HtmlResponse(
 )
 test_responses.append({"original": unprocessed, "expected": unprocessed})
 
-response_body_test = b'<html>Hello middleware test!</html>'
-test_responses.append({
+response_body_test = b"<html>Hello middleware test!</html>"
+test_responses.append(
+    {
         "original": HtmlResponse(
             url=SETTINGS["CRAWLERA_FETCH_URL"],
             status=200,
@@ -191,10 +192,10 @@ test_responses.append({
                     "headers": {
                         "Content-Encoding": "gzip",
                         "Content-Type": "text/html",
-                        "Date": "Fri, 24 Apr 2020 18:06:42 GMT"
-                    }
+                        "Date": "Fri, 24 Apr 2020 18:06:42 GMT",
+                    },
                 }
-            ).encode()
+            ).encode(),
         ),
         "expected": HtmlResponse(
             url="http://httpbin.org/ip",
