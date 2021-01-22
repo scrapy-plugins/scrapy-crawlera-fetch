@@ -1,3 +1,5 @@
+import base64
+import binascii
 import json
 import logging
 import os
@@ -14,8 +16,6 @@ from scrapy.responsetypes import responsetypes
 from scrapy.spiders import Spider
 from scrapy.utils.reqser import request_from_dict, request_to_dict
 from w3lib.http import basic_auth_header
-import base64
-import binascii
 
 
 logger = logging.getLogger("crawlera-fetch-middleware")

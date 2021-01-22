@@ -1,3 +1,6 @@
+import base64
+import json
+
 from scrapy.http.request import Request
 from scrapy.http.response.html import HtmlResponse
 from scrapy.http.response.text import TextResponse
@@ -5,8 +8,6 @@ from scrapy.utils.reqser import request_to_dict
 
 from tests.data import SETTINGS
 from tests.utils import foo_spider, mocked_time
-import json
-import base64
 
 
 test_responses = []
