@@ -185,7 +185,9 @@ test_responses.append({
                 {
                     "id": "8498642e-1de3-40dd-b32f-f6eb6131e45e",
                     "body": base64.b64encode(response_body_test).decode(),
-                    "original_status": 200, "url": "http://httpbin.org/ip", "original_url": "http://httpbin.org/ip",
+                    "original_status": 200,
+                    "url": "http://httpbin.org/ip",
+                    "original_url": "http://httpbin.org/ip",
                     "headers": {
                         "Content-Encoding": "gzip",
                         "Content-Type": "text/html",
@@ -206,4 +208,3 @@ test_responses.append({
         ),
     }
 )
-
