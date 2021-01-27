@@ -190,14 +190,14 @@ class CrawleraFetchMiddleware:
             self.stats.inc_value("crawlera_fetch/response_error/{}".format(server_error))
             log_msg = (
                 "Error downloading <{} {}> (Original status: {}, Fetch API error message: {}). "
-                "Request ID: {}"
+                "(Request ID {})"
             )
             log_msg = log_msg.format(
                 original_request.method,
                 original_request.url,
                 original_status,
                 message,
-                request_id,
+                request_id or 'unknown',
             )
             if self.raise_on_error:
                 raise CrawleraFetchException(log_msg)

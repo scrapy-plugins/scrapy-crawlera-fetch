@@ -156,7 +156,7 @@ def test_process_response_error():
         (
             "crawlera-fetch-middleware",
             "WARNING",
-            "Error downloading <GET https://example.org> (Original status: 503, Fetch API error message: Server busy: too many outstanding requests). Request ID: None",  # noqa: E501
+            "Error downloading <GET https://example.org> (Original status: 503, Fetch API error message: Server busy: too many outstanding requests). (Request ID unknown)",  # noqa: E501
         ),
     )
 
