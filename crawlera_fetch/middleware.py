@@ -197,7 +197,7 @@ class CrawleraFetchMiddleware:
                 original_request.url,
                 original_status,
                 message,
-                request_id or 'unknown',
+                request_id or "unknown",
             )
             if self.raise_on_error:
                 raise CrawleraFetchException(log_msg)
