@@ -184,7 +184,7 @@ class CrawleraFetchMiddleware:
                 return response
 
         server_error = json_response.get("crawlera_error") or json_response.get("error_code")
-        original_status = json_response.get("original_status", response.status)
+        original_status = json_response.get("original_status")
         request_id = json_response.get("id") or json_response.get("uncork_id")
         if server_error:
             message = json_response.get("body") or json_response.get("message")
@@ -197,7 +197,7 @@ class CrawleraFetchMiddleware:
             log_msg = log_msg.format(
                 original_request.method,
                 original_request.url,
-                original_status,
+                original_status or "unknown",
                 message,
                 request_id or "unknown",
             )
@@ -230,7 +230,7 @@ class CrawleraFetchMiddleware:
             headers=json_response["headers"],
             url=json_response["url"],
             body=resp_body,
-            status=original_status,
+            status=original_status or 200,
         )
 
     def _set_download_slot(self, request, spider):
