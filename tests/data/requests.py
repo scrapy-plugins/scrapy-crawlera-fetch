@@ -31,8 +31,7 @@ def get_test_requests():
         method="POST",
         headers={
             "Authorization": basic_auth_header(
-                SETTINGS["CRAWLERA_FETCH_APIKEY"],
-                SETTINGS["CRAWLERA_FETCH_APIPASS"]
+                SETTINGS["CRAWLERA_FETCH_APIKEY"], SETTINGS["CRAWLERA_FETCH_APIPASS"]
             ),
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -81,8 +80,7 @@ def get_test_requests():
         method="POST",
         headers={
             "Authorization": basic_auth_header(
-                SETTINGS["CRAWLERA_FETCH_APIKEY"],
-                SETTINGS["CRAWLERA_FETCH_APIPASS"]
+                SETTINGS["CRAWLERA_FETCH_APIKEY"], SETTINGS["CRAWLERA_FETCH_APIPASS"]
             ),
             "Content-Type": "application/json",
             "Accept": "application/json",
