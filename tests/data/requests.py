@@ -30,7 +30,10 @@ def get_test_requests():
         callback=foo_spider.foo_callback,
         method="POST",
         headers={
-            "Authorization": basic_auth_header(SETTINGS["CRAWLERA_FETCH_APIKEY"], SETTINGS["CRAWLERA_FETCH_APIPASS"]),
+            "Authorization": basic_auth_header(
+                SETTINGS["CRAWLERA_FETCH_APIKEY"],
+                SETTINGS["CRAWLERA_FETCH_APIPASS"]
+            ),
             "Content-Type": "application/json",
             "Accept": "application/json",
             "X-Crawlera-JobId": "1/2/3",
@@ -77,7 +80,10 @@ def get_test_requests():
         url=SETTINGS["CRAWLERA_FETCH_URL"],
         method="POST",
         headers={
-            "Authorization": basic_auth_header(SETTINGS["CRAWLERA_FETCH_APIKEY"], SETTINGS["CRAWLERA_FETCH_APIPASS"]),
+            "Authorization": basic_auth_header(
+                SETTINGS["CRAWLERA_FETCH_APIKEY"],
+                SETTINGS["CRAWLERA_FETCH_APIPASS"]
+            ),
             "Content-Type": "application/json",
             "Accept": "application/json",
             "X-Crawlera-JobId": "1/2/3",
