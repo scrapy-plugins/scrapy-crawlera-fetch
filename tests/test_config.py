@@ -25,3 +25,15 @@ def test_config_values():
 
     assert middleware.apikey == SETTINGS["CRAWLERA_FETCH_APIKEY"]
     assert middleware.url == SETTINGS["CRAWLERA_FETCH_URL"]
+    assert middleware.apipass == SETTINGS["CRAWLERA_FETCH_APIPASS"]
+
+
+def test_config_without_apipass():
+    s = SETTINGS.copy()
+    s.pop("CRAWLERA_FETCH_APIPASS", None)
+    crawler = get_crawler(settings_dict=s)
+    middleware = CrawleraFetchMiddleware.from_crawler(crawler)
+
+    assert middleware.apikey == SETTINGS["CRAWLERA_FETCH_APIKEY"]
+    assert middleware.url == SETTINGS["CRAWLERA_FETCH_URL"]
+    assert middleware.apipass == ""
