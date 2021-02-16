@@ -47,7 +47,8 @@ class CrawleraFetchMiddleware:
             raise NotConfigured("Crawlera Fetch API cannot be used without an apikey")
         else:
             self.apikey = crawler.settings["CRAWLERA_FETCH_APIKEY"]
-            self.auth_header = basic_auth_header(self.apikey, "")
+            self.apipass = crawler.settings.get("CRAWLERA_FETCH_APIPASS", "")
+            self.auth_header = basic_auth_header(self.apikey, self.apipass)
 
         if crawler.settings.get("CRAWLERA_FETCH_URL"):
             self.url = crawler.settings["CRAWLERA_FETCH_URL"]
