@@ -9,11 +9,12 @@ from typing import Optional, Type, TypeVar
 
 import scrapy
 from scrapy.crawler import Crawler
-from scrapy.exceptions import NotConfigured
 from scrapy.http.request import Request
 from scrapy.http.response import Response
 from scrapy.responsetypes import responsetypes
+from scrapy.settings import BaseSettings
 from scrapy.spiders import Spider
+from scrapy.statscollectors import StatsCollector
 from scrapy.utils.reqser import request_from_dict, request_to_dict
 from w3lib.http import basic_auth_header
 
@@ -38,53 +39,78 @@ class CrawleraFetchException(Exception):
 
 
 class CrawleraFetchMiddleware:
-
     url = "http://fetch.crawlera.com:8010/fetch/v2/"
     apikey = ""
+    enabled = False
 
-    def __init__(self, crawler: Crawler) -> None:
-        if not crawler.settings.getbool("CRAWLERA_FETCH_ENABLED"):
-            raise NotConfigured()
-        elif crawler.settings.get("CRAWLERA_FETCH_APIKEY") is None:
-            raise NotConfigured("Crawlera Fetch API cannot be used without an apikey")
-        elif crawler.settings.get("CRAWLERA_FETCH_APIKEY"):
-            self.apikey = crawler.settings["CRAWLERA_FETCH_APIKEY"]
-            self.apipass = crawler.settings.get("CRAWLERA_FETCH_APIPASS", "")
-            self.auth_header = basic_auth_header(self.apikey, self.apipass)
-
-        if crawler.settings.get("CRAWLERA_FETCH_URL"):
-            self.url = crawler.settings["CRAWLERA_FETCH_URL"]
-
-        self.download_slot_policy = crawler.settings.get(
-            "CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
-        )
-
-        self.raise_on_error = crawler.settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR", True)
-
-        self.default_args = crawler.settings.getdict("CRAWLERA_FETCH_DEFAULT_ARGS", {})
-
-        crawler.signals.connect(self.spider_closed, signal=scrapy.signals.spider_closed)
-
-        self.crawler = crawler
-        self.stats = crawler.stats
-        self.total_latency = 0
-
-        logger.info(
-            "Using Crawlera Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
-        )
+    crawler = None  # type: Crawler
+    stats = None  # type: StatsCollector
+    total_latency = None  # type: int
 
     @classmethod
     def from_crawler(cls: Type[MiddlewareTypeVar], crawler: Crawler) -> MiddlewareTypeVar:
-        return cls(crawler)
+        middleware = cls()
+        crawler.signals.connect(middleware.spider_opened, signal=scrapy.signals.spider_opened)
+        crawler.signals.connect(middleware.spider_closed, signal=scrapy.signals.spider_closed)
+        middleware.crawler = crawler
+        middleware.stats = crawler.stats
+        middleware.total_latency = 0
+        return middleware
+
+    def _read_settings(self, settings):
+        if settings.get("CRAWLERA_FETCH_APIKEY") is None:
+            self.enabled = False
+            logger.info("Crawlera Fetch API cannot be used without an apikey")
+            return
+
+        self.apikey = settings["CRAWLERA_FETCH_APIKEY"]
+        self.apipass = settings.get("CRAWLERA_FETCH_APIPASS", "")
+        self.auth_header = basic_auth_header(self.apikey, self.apipass)
+
+        if settings.get("CRAWLERA_FETCH_URL"):
+            self.url = settings["CRAWLERA_FETCH_URL"]
+
+        self.download_slot_policy = settings.get(
+            "CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
+        )
+
+        self.raise_on_error = settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR", True)
+
+        self.default_args = settings.getdict("CRAWLERA_FETCH_DEFAULT_ARGS", {})
+
+    def spider_opened(self, spider):
+        try:
+            spider_attr = getattr(spider, "crawlera_fetch_enabled")
+        except AttributeError:
+            if not spider.crawler.settings.getbool("CRAWLERA_FETCH_ENABLED"):
+                self.enabled = False
+                logger.info("Crawlera Fetch disabled (CRAWLERA_FETCH_ENABLED setting)")
+                return
+        else:
+            if not BaseSettings({"enabled": spider_attr}).getbool("enabled"):
+                self.enabled = False
+                logger.info("Crawlera Fetch disabled (crawlera_fetch_enabled spider attribute)")
+                return
+
+        self.enabled = True
+        self._read_settings(spider.crawler.settings)
+        if self.enabled:
+            logger.info(
+                "Using Crawlera Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
+            )
 
     def spider_closed(self, spider, reason):
-        self.stats.set_value("crawlera_fetch/total_latency", self.total_latency)
-        response_count = self.stats.get_value("crawlera_fetch/response_count")
-        if response_count:
-            avg_latency = self.total_latency / response_count
-            self.stats.set_value("crawlera_fetch/avg_latency", avg_latency)
+        if self.enabled:
+            self.stats.set_value("crawlera_fetch/total_latency", self.total_latency)
+            response_count = self.stats.get_value("crawlera_fetch/response_count")
+            if response_count:
+                avg_latency = self.total_latency / response_count
+                self.stats.set_value("crawlera_fetch/avg_latency", avg_latency)
 
     def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
+        if not self.enabled:
+            return None
+
         try:
             crawlera_meta = request.meta[META_KEY]
         except KeyError:
@@ -132,6 +158,9 @@ class CrawleraFetchMiddleware:
         return request.replace(url=self.url, method="POST", body=body_json)
 
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
+        if not self.enabled:
+            return response
+
         try:
             crawlera_meta = request.meta[META_KEY]
         except KeyError:
