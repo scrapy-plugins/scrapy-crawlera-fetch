@@ -58,7 +58,7 @@ class CrawleraFetchMiddleware:
         return middleware
 
     def _read_settings(self, settings):
-        if settings.get("CRAWLERA_FETCH_APIKEY") is None:
+        if not settings.get("CRAWLERA_FETCH_APIKEY"):
             self.enabled = False
             logger.info("Crawlera Fetch API cannot be used without an apikey")
             return
