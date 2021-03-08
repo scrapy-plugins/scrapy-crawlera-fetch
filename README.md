@@ -44,7 +44,8 @@ Crawlera middleware won't be able to handle them.
 ### Settings
 
 * `CRAWLERA_FETCH_ENABLED` (type `bool`, default `False`). Whether or not the middleware will be enabled,
-    i.e. requests should be downloaded using the Crawlera Fetch API
+    i.e. requests should be downloaded using the Crawlera Fetch API. The `crawlera_fetch_enabled` spider
+    attribute takes precedence over this setting.
 
 * `CRAWLERA_FETCH_APIKEY` (type `str`). API key to be used to authenticate against the Crawlera endpoint
     (mandatory if enabled)
@@ -66,6 +67,11 @@ Crawlera middleware won't be able to handle them.
 * `CRAWLERA_FETCH_DEFAULT_ARGS` (type `dict`, default `{}`)
     Default values to be sent to the Crawlera Fetch API. For instance, set to `{"device": "mobile"}`
     to render all requests with a mobile profile.
+
+### Spider attributes
+
+* `crawlera_fetch_enabled` (type `bool`, default `False`). Whether or not the middleware will be enabled.
+    Takes precedence over the `CRAWLERA_FETCH_ENABLED` setting.
 
 ### Log formatter
 
