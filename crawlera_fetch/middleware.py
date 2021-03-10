@@ -100,7 +100,7 @@ class CrawleraFetchMiddleware:
 
         shub_jobkey = os.environ.get("SHUB_JOBKEY")
         if shub_jobkey:
-            self.default_args['job_id'] = shub_jobkey
+            self.default_args["job_id"] = shub_jobkey
 
         # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
