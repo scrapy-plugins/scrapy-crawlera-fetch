@@ -98,6 +98,10 @@ class CrawleraFetchMiddleware:
         self.stats.inc_value("crawlera_fetch/request_count")
         self.stats.inc_value("crawlera_fetch/request_method_count/{}".format(request.method))
 
+        shub_jobkey = os.environ.get("SHUB_JOBKEY")
+        if shub_jobkey:
+            self.default_args['job_id'] = shub_jobkey
+
         # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
         body = {"url": request.url, "body": original_body_text}
@@ -120,8 +124,9 @@ class CrawleraFetchMiddleware:
         if self.apikey:
             additional_headers["Authorization"] = self.auth_header
         request.headers.update(additional_headers)
-        if os.environ.get("SHUB_JOBKEY"):
-            request.headers["X-Crawlera-JobId"] = os.environ["SHUB_JOBKEY"]
+
+        if shub_jobkey:
+            request.headers["X-Crawlera-JobId"] = shub_jobkey
 
         if scrapy.version_info < (2, 0, 0):
             original_url_flag = "original url: {}".format(request.url)
