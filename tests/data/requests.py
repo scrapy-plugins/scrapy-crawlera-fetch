@@ -58,6 +58,7 @@ def get_test_requests():
                 "region": "us",
                 "iptype": "datacenter",
                 "device": "mobile",
+                "job_id": "1/2/3",
             }
         ),
     )
@@ -99,6 +100,7 @@ def get_test_requests():
                 "method": "POST",
                 "body": "foo=bar",
                 "device": "desktop",
+                "job_id": "1/2/3",
             }
         ),
     )
