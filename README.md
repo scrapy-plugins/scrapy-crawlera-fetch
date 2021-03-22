@@ -67,13 +67,13 @@ Crawlera middleware won't be able to handle them.
     Default values to be sent to the Crawlera Fetch API. You can find parameters [on this page](https://docs.zyte.com/smart-proxy-manager/fetch-api.html#request-endpoint-parameters).
     For example:
 
-```python
-'CRAWLERA_FETCH_DEFAULT_ARGS': {
-    'region': 'gb',
-    'waitfor_selector': '#cookieLoad',
-    'device': 'mobile'
-}
-```
+    ```python
+    'CRAWLERA_FETCH_DEFAULT_ARGS': {
+        'region': 'gb',
+        'waitfor_selector': '#cookieLoad',
+        'device': 'mobile'
+    }
+    ```
 
 ### Log formatter
 
