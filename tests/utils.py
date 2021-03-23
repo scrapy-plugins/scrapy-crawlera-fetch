@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from scrapy import Spider
 from scrapy.utils.test import get_crawler
 
-from crawlera_fetch.middleware import SmartProxyManagerFetchMiddleware
+from zyte_proxy_fetch.middleware import SmartProxyManagerFetchMiddleware
 
 from tests.data import SETTINGS
 

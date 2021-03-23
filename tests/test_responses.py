@@ -6,7 +6,7 @@ from scrapy.http.response.text import TextResponse
 from scrapy.utils.reqser import request_to_dict
 from testfixtures import LogCapture
 
-from crawlera_fetch.middleware import SmartProxyManagerFetchException
+from zyte_proxy_fetch.middleware import SmartProxyManagerFetchException
 
 from tests.data.responses import test_responses
 from tests.utils import foo_spider, get_test_middleware, mocked_time

@@ -5,7 +5,7 @@ from scrapy import version_info as scrapy_version
 from scrapy.http.response import Response
 from twisted.python.failure import Failure
 
-from crawlera_fetch.logformatter import SmartProxyManagerLogFormatter
+from zyte_proxy_fetch.logformatter import SmartProxyManagerLogFormatter
 
 from tests.data.requests import get_test_requests
 from tests.utils import foo_spider, get_test_middleware

@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from scrapy import Request
 
-from crawlera_fetch import DownloadSlotPolicy
+from zyte_proxy_fetch import DownloadSlotPolicy
 
 from tests.data.requests import get_test_requests
 from tests.utils import foo_spider, get_test_middleware, mocked_time

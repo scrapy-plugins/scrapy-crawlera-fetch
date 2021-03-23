@@ -2,7 +2,7 @@ import pytest
 from scrapy.exceptions import NotConfigured
 from scrapy.utils.test import get_crawler
 
-from crawlera_fetch import SmartProxyManagerFetchMiddleware
+from zyte_proxy_fetch import SmartProxyManagerFetchMiddleware
 
 from tests.data import SETTINGS
 

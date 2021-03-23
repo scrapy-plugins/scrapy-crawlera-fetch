@@ -14,7 +14,7 @@ setuptools.setup(
     author="Zyte",
     author_email="opensource@zyte.com",
     url="https://github.com/scrapy-plugins/scrapy-zyte-proxy-fetch",
-    packages=["crawlera_fetch"],
+    packages=["zyte_proxy_fetch"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "License :: OSI Approved :: BSD License",

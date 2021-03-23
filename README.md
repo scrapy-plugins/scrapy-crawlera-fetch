@@ -33,7 +33,7 @@ setting:
 
 ```
 DOWNLOADER_MIDDLEWARES = {
-    "crawlera_fetch.SmartProxyManagerFetchMiddleware": 585,
+    "zyte_proxy_fetch.SmartProxyManagerFetchMiddleware": 585,
 }
 ```
 
@@ -56,7 +56,7 @@ Smart Proxy Manager middleware won't be able to handle them.
     raise an exception if an error occurs while downloading or decoding a request. If `False`, a
     warning will be logged and the raw upstream response will be returned upon encountering an error.
 
-* `ZYTE_PROXY_FETCH_DOWNLOAD_SLOT_POLICY` (type `enum.Enum` - `crawlera_fetch.DownloadSlotPolicy`,
+* `ZYTE_PROXY_FETCH_DOWNLOAD_SLOT_POLICY` (type `enum.Enum` - `zyte_proxy_fetch.DownloadSlotPolicy`,
     default `DownloadSlotPolicy.Domain`).
     Possible values are `DownloadSlotPolicy.Domain`, `DownloadSlotPolicy.Single`,
     `DownloadSlotPolicydefault` (Scrapy default). If set to `DownloadSlotPolicy.Domain`, please
@@ -75,7 +75,7 @@ log formatter by overriding the [`LOG_FORMATTER`](https://docs.scrapy.org/en/lat
 setting:
 
 ```
-LOG_FORMATTER = "crawlera_fetch.SmartProxyManagerLogFormatter"
+LOG_FORMATTER = "zyte_proxy_fetch.SmartProxyManagerLogFormatter"
 ```
 
 Note that the ability to override the error messages for spider and download errors was added
@@ -106,12 +106,12 @@ Request(url="<Smart Proxy Manager Fetch API endpoint>", method="POST",
 
 ### Additional arguments
 
-Additional arguments could be specified under the `crawlera_fetch.args` `Request.meta` key. For instance:
+Additional arguments could be specified under the `zyte_proxy_fetch.args` `Request.meta` key. For instance:
 
 ```python
 Request(
     url="https://example.org",
-    meta={"crawlera_fetch": {"args": {"region": "us", "device": "mobile"}}},
+    meta={"zyte_proxy_fetch": {"args": {"region": "us", "device": "mobile"}}},
 )
 ```
 
@@ -121,26 +121,26 @@ is translated into the following body:
 '{"url": "https://example.org", "method": "GET", "body": "", "region": "us", "device": "mobile"}'
 ```
 
-Arguments set for a specific request through the `crawlera_fetch.args` key override those
+Arguments set for a specific request through the `zyte_proxy_fetch.args` key override those
 set with the `ZYTE_PROXY_FETCH_DEFAULT_ARGS` setting.
 
 ### Accessing original request and raw Zyte Smart Proxy Manager response
 
 The `url`, `method`, `headers` and `body` attributes of the original request are available under
-the `crawlera_fetch.original_request` `Response.meta` key.
+the `zyte_proxy_fetch.original_request` `Response.meta` key.
 
 The `status`, `headers` and `body` attributes of the upstream Smart Proxy Manager response are available under
-the `crawlera_fetch.upstream_response` `Response.meta` key.
+the `zyte_proxy_fetch.upstream_response` `Response.meta` key.
 
 ### Skipping requests
 
-You can instruct the middleware to skip a specific request by setting the `crawlera_fetch.skip`
+You can instruct the middleware to skip a specific request by setting the `zyte_proxy_fetch.skip`
 [Request.meta](https://docs.scrapy.org/en/latest/topics/request-response.html#scrapy.http.Request.meta)
 key:
 
 ```python
 Request(
     url="https://example.org",
-    meta={"crawlera_fetch": {"skip": True}},
+    meta={"zyte_proxy_fetch": {"skip": True}},
 )
 ```
