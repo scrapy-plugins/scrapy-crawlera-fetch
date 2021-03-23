@@ -34,8 +34,8 @@ def test_process_request():
         with shub_jobkey_env_variable():
             processed = middleware.process_request(original, foo_spider)
 
-        crawlera_meta = original.meta.get("crawlera_fetch")
-        if crawlera_meta.get("skip"):
+        zyte_proxy_meta = original.meta.get("zyte_proxy_fetch")
+        if zyte_proxy_meta.get("skip"):
             assert processed is None
         else:
             assert type(processed) is type(expected)
@@ -51,20 +51,20 @@ def test_process_request():
 @patch("time.time", mocked_time)
 def test_process_request_single_download_slot():
     middleware = get_test_middleware(
-        settings={"CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY": DownloadSlotPolicy.Single}
+        settings={"ZYTE_PROXY_FETCH_DOWNLOAD_SLOT_POLICY": DownloadSlotPolicy.Single}
     )
 
     for case in get_test_requests():
         original = case["original"]
         expected = case["expected"]
         if expected:
-            expected.meta["download_slot"] = "__crawlera_fetch__"
+            expected.meta["download_slot"] = "__zyte_proxy_fetch__"
 
         with shub_jobkey_env_variable():
             processed = middleware.process_request(original, foo_spider)
 
-        crawlera_meta = original.meta.get("crawlera_fetch")
-        if crawlera_meta.get("skip"):
+        zyte_proxy_meta = original.meta.get("zyte_proxy_fetch")
+        if zyte_proxy_meta.get("skip"):
             assert processed is None
         else:
             assert type(processed) is type(expected)
@@ -80,15 +80,15 @@ def test_process_request_single_download_slot():
 @patch("time.time", mocked_time)
 def test_process_request_default_args():
     middleware = get_test_middleware(
-        settings={"CRAWLERA_FETCH_DEFAULT_ARGS": {"foo": "bar", "answer": "42"}}
+        settings={"ZYTE_PROXY_FETCH_DEFAULT_ARGS": {"foo": "bar", "answer": "42"}}
     )
 
     for case in get_test_requests():
         original = case["original"]
         processed = middleware.process_request(original, foo_spider)
 
-        crawlera_meta = original.meta.get("crawlera_fetch")
-        if crawlera_meta.get("skip"):
+        zyte_proxy_meta = original.meta.get("zyte_proxy_fetch")
+        if zyte_proxy_meta.get("skip"):
             assert processed is None
         else:
             processed_text = processed.body.decode(processed.encoding)

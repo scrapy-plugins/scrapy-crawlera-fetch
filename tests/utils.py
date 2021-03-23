@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from scrapy import Spider
 from scrapy.utils.test import get_crawler
 
-from crawlera_fetch.middleware import CrawleraFetchMiddleware
+from crawlera_fetch.middleware import SmartProxyManagerFetchMiddleware
 
 from tests.data import SETTINGS
 
@@ -36,7 +36,7 @@ def get_test_middleware(settings=None):
     settings_dict.update(settings or {})
     crawler = get_crawler(FooSpider, settings_dict=settings_dict)
     crawler.engine = MockEngine()
-    middleware = CrawleraFetchMiddleware.from_crawler(crawler)
+    middleware = SmartProxyManagerFetchMiddleware.from_crawler(crawler)
     return middleware
 
 

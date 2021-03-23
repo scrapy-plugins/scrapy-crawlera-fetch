@@ -43,14 +43,14 @@ def test_stats(mocked_time):
 
     middleware.spider_closed(spider, "finished")
 
-    assert middleware.stats.get_value("crawlera_fetch/request_count") == count
-    assert middleware.stats.get_value("crawlera_fetch/response_count") == count
-    assert middleware.stats.get_value("crawlera_fetch/total_latency") == total_latency
-    assert middleware.stats.get_value("crawlera_fetch/avg_latency") == avg_latency
-    assert middleware.stats.get_value("crawlera_fetch/max_latency") == max_latency
+    assert middleware.stats.get_value("zyte_proxy_fetch/request_count") == count
+    assert middleware.stats.get_value("zyte_proxy_fetch/response_count") == count
+    assert middleware.stats.get_value("zyte_proxy_fetch/total_latency") == total_latency
+    assert middleware.stats.get_value("zyte_proxy_fetch/avg_latency") == avg_latency
+    assert middleware.stats.get_value("zyte_proxy_fetch/max_latency") == max_latency
     for status in set(status_list):
-        sc = middleware.stats.get_value("crawlera_fetch/response_status_count/{}".format(status))
+        sc = middleware.stats.get_value("zyte_proxy_fetch/response_status_count/{}".format(status))
         assert sc == status_list.count(status)
     for method in set(method_list):
-        mc = middleware.stats.get_value("crawlera_fetch/request_method_count/{}".format(method))
+        mc = middleware.stats.get_value("zyte_proxy_fetch/request_method_count/{}".format(method))
         assert mc == method_list.count(method)

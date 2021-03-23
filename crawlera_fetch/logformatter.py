@@ -9,9 +9,9 @@ from scrapy.spiders import Spider
 from twisted.python.failure import Failure
 
 
-class CrawleraFetchLogFormatter(LogFormatter):
+class SmartProxyManagerLogFormatter(LogFormatter):
     """
-    Since the CrawleraFetchMiddleware sets a new URL for outgoing requests, by
+    Since the SmartProxyManagerFetchMiddleware sets a new URL for outgoing requests, by
     default the URLs shown in the logs are not the original ones. By enabling
     this formatter, this behaviour is reverted.
 
@@ -30,7 +30,7 @@ class CrawleraFetchLogFormatter(LogFormatter):
 
     def crawled(self, request: Request, response: Response, spider: Spider) -> dict:
         return self._set_target_url(
-            result=super(CrawleraFetchLogFormatter, self).crawled(request, response, spider),
+            result=super(SmartProxyManagerLogFormatter, self).crawled(request, response, spider),
             request=request,
         )
 
@@ -41,7 +41,7 @@ class CrawleraFetchLogFormatter(LogFormatter):
         Only available in Scrapy 2.0+
         """
         return self._set_target_url(
-            result=super(CrawleraFetchLogFormatter, self).spider_error(
+            result=super(SmartProxyManagerLogFormatter, self).spider_error(
                 failure, request, response, spider
             ),
             request=request,
@@ -54,7 +54,7 @@ class CrawleraFetchLogFormatter(LogFormatter):
         Only available in Scrapy 2.0+
         """
         return self._set_target_url(
-            result=super(CrawleraFetchLogFormatter, self).download_error(
+            result=super(SmartProxyManagerLogFormatter, self).download_error(
                 failure, request, spider, errmsg
             ),
             request=request,

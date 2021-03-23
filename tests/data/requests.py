@@ -15,7 +15,7 @@ def get_test_requests():
         url="https://httpbin.org/anything",
         method="GET",
         meta={
-            "crawlera_fetch": {
+            "zyte_proxy_fetch": {
                 "args": {
                     "render": "no",
                     "region": "us",
@@ -26,19 +26,19 @@ def get_test_requests():
         },
     )
     expected1 = Request(
-        url=SETTINGS["CRAWLERA_FETCH_URL"],
+        url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
         callback=foo_spider.foo_callback,
         method="POST",
         headers={
             "Authorization": basic_auth_header(
-                SETTINGS["CRAWLERA_FETCH_APIKEY"], SETTINGS["CRAWLERA_FETCH_APIPASS"]
+                SETTINGS["ZYTE_PROXY_FETCH_APIKEY"], SETTINGS["ZYTE_PROXY_FETCH_APIPASS"]
             ),
             "Content-Type": "application/json",
             "Accept": "application/json",
             "X-Crawlera-JobId": "1/2/3",
         },
         meta={
-            "crawlera_fetch": {
+            "zyte_proxy_fetch": {
                 "args": {
                     "render": "no",
                     "region": "us",
@@ -72,22 +72,22 @@ def get_test_requests():
     original2 = FormRequest(
         url="https://httpbin.org/post",
         callback=foo_spider.foo_callback,
-        meta={"crawlera_fetch": {"args": {"device": "desktop"}}},
+        meta={"zyte_proxy_fetch": {"args": {"device": "desktop"}}},
         formdata={"foo": "bar"},
     )
     expected2 = FormRequest(
-        url=SETTINGS["CRAWLERA_FETCH_URL"],
+        url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
         method="POST",
         headers={
             "Authorization": basic_auth_header(
-                SETTINGS["CRAWLERA_FETCH_APIKEY"], SETTINGS["CRAWLERA_FETCH_APIPASS"]
+                SETTINGS["ZYTE_PROXY_FETCH_APIKEY"], SETTINGS["ZYTE_PROXY_FETCH_APIPASS"]
             ),
             "Content-Type": "application/json",
             "Accept": "application/json",
             "X-Crawlera-JobId": "1/2/3",
         },
         meta={
-            "crawlera_fetch": {
+            "zyte_proxy_fetch": {
                 "args": {"device": "desktop"},
                 "original_request": request_to_dict(original2, spider=foo_spider),
                 "timing": {"start_ts": mocked_time()},
@@ -116,7 +116,7 @@ def get_test_requests():
             "original": Request(
                 url="https://example.org",
                 method="HEAD",
-                meta={"crawlera_fetch": {"skip": True}},
+                meta={"zyte_proxy_fetch": {"skip": True}},
             ),
             "expected": None,
         }

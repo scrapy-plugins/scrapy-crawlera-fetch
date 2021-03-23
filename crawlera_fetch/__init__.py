@@ -1,2 +1,2 @@
-from .logformatter import CrawleraFetchLogFormatter  # noqa: F401
-from .middleware import CrawleraFetchMiddleware, DownloadSlotPolicy  # noqa: F401
+from .logformatter import SmartProxyManagerLogFormatter  # noqa: F401
+from .middleware import SmartProxyManagerFetchMiddleware, DownloadSlotPolicy  # noqa: F401

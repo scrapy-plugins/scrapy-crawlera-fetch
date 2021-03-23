@@ -5,7 +5,7 @@ from scrapy import version_info as scrapy_version
 from scrapy.http.response import Response
 from twisted.python.failure import Failure
 
-from crawlera_fetch.logformatter import CrawleraFetchLogFormatter
+from crawlera_fetch.logformatter import SmartProxyManagerLogFormatter
 
 from tests.data.requests import get_test_requests
 from tests.utils import foo_spider, get_test_middleware
@@ -14,7 +14,7 @@ from tests.utils import foo_spider, get_test_middleware
 @unittest.skipIf(scrapy_version > (2, 0, 0), "Scrapy < 2.0 only")
 def test_log_formatter_scrapy_1():
     middleware = get_test_middleware()
-    logformatter = CrawleraFetchLogFormatter()
+    logformatter = SmartProxyManagerLogFormatter()
     formatter = Formatter()
 
     for case in get_test_requests():
@@ -22,8 +22,8 @@ def test_log_formatter_scrapy_1():
         response = Response(original.url)
         processed = middleware.process_request(original, foo_spider)
 
-        crawlera_meta = original.meta.get("crawlera_fetch") or {}
-        if crawlera_meta.get("skip"):
+        zyte_proxy_meta = original.meta.get("zyte_proxy_fetch") or {}
+        if zyte_proxy_meta.get("skip"):
             assert processed is None
             continue
 
@@ -41,7 +41,7 @@ def test_log_formatter_scrapy_1():
 @unittest.skipIf(scrapy_version < (2, 0, 0), "Scrapy >= 2.0 only")
 def test_log_formatter_scrapy_2():
     middleware = get_test_middleware()
-    logformatter = CrawleraFetchLogFormatter()
+    logformatter = SmartProxyManagerLogFormatter()
     formatter = Formatter()
 
     for case in get_test_requests():
@@ -49,8 +49,8 @@ def test_log_formatter_scrapy_2():
         response = Response(original.url)
         processed = middleware.process_request(original, foo_spider)
 
-        crawlera_meta = original.meta.get("crawlera_fetch") or {}
-        if crawlera_meta.get("skip"):
+        zyte_proxy_meta = original.meta.get("zyte_proxy_fetch") or {}
+        if zyte_proxy_meta.get("skip"):
             assert processed is None
             continue
 
