@@ -47,8 +47,7 @@ class SmartProxyManagerFetchMiddleware:
             raise NotConfigured()
         elif crawler.settings.get("ZYTE_PROXY_FETCH_APIKEY") is None:
             raise NotConfigured(
-                "Zyte Smart Proxy Manager Fetch API cannot "
-                "be used without an apikey"
+                "Zyte Smart Proxy Manager Fetch API cannot be used without an apikey"
             )
         elif crawler.settings.get("ZYTE_PROXY_FETCH_APIKEY"):
             self.apikey = crawler.settings["ZYTE_PROXY_FETCH_APIKEY"]
@@ -73,8 +72,8 @@ class SmartProxyManagerFetchMiddleware:
         self.total_latency = 0
 
         logger.info(
-            "Using Zyte Smart Proxy Manager Fetch API at %s with apikey %s***" %
-            (self.url, self.apikey[:5])
+            "Using Zyte Smart Proxy Manager Fetch API at %s with apikey %s***"
+            % (self.url, self.apikey[:5])
         )
 
     @classmethod
@@ -257,7 +256,6 @@ class SmartProxyManagerFetchMiddleware:
         timing["latency"] = timing["end_ts"] - timing["start_ts"]
         self.total_latency += timing["latency"]
         max_latency = max(
-            self.stats.get_value("zyte_proxy_fetch/max_latency", 0),
-            timing["latency"]
+            self.stats.get_value("zyte_proxy_fetch/max_latency", 0), timing["latency"]
         )
         self.stats.set_value("zyte_proxy_fetch/max_latency", max_latency)
