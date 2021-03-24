@@ -23,6 +23,14 @@ def shub_jobkey_env_variable():
             os.environ["SHUB_JOBKEY"] = SHUB_JOBKEY_OLD
 
 
+def test_process_request_disabled():
+    middleware = get_test_middleware(settings={"CRAWLERA_FETCH_ENABLED": False})
+    for case in get_test_requests():
+        request = case["original"]
+        with shub_jobkey_env_variable():
+            assert middleware.process_request(request, foo_spider) is None
+
+
 @patch("time.time", mocked_time)
 def test_process_request():
     middleware = get_test_middleware()

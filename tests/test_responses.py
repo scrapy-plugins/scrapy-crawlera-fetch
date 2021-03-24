@@ -12,6 +12,13 @@ from tests.data.responses import test_responses
 from tests.utils import foo_spider, get_test_middleware, mocked_time
 
 
+def test_process_response_disabled():
+    middleware = get_test_middleware(settings={"CRAWLERA_FETCH_ENABLED": False})
+    for case in test_responses:
+        response = case["original"]
+        assert middleware.process_response(response.request, response, foo_spider) is response
+
+
 def test_process_response():
     middleware = get_test_middleware()
 
