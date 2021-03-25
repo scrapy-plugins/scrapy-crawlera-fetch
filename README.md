@@ -65,8 +65,16 @@ Crawlera middleware won't be able to handle them.
     make better usage of concurrency options and avoid delays.
 
 * `CRAWLERA_FETCH_DEFAULT_ARGS` (type `dict`, default `{}`)
-    Default values to be sent to the Crawlera Fetch API. For instance, set to `{"device": "mobile"}`
-    to render all requests with a mobile profile.
+    Default values to be sent to the Crawlera Fetch API. You can find parameters [on this page](https://docs.zyte.com/smart-proxy-manager/fetch-api.html#request-endpoint-parameters).
+    For example:
+
+    ```python
+    'CRAWLERA_FETCH_DEFAULT_ARGS': {
+        'region': 'gb',
+        'waitfor_selector': '#cookieLoad',
+        'device': 'mobile'
+    }
+    ```
 
 ### Spider attributes
 
