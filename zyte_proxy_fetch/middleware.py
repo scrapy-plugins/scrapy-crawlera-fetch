@@ -19,7 +19,7 @@ from scrapy.utils.reqser import request_from_dict, request_to_dict
 from w3lib.http import basic_auth_header
 
 
-logger = logging.getLogger("crawlera-fetch-middleware")
+logger = logging.getLogger("zyte-proxy-fetch-middleware")
 
 
 MiddlewareTypeVar = TypeVar("MiddlewareTypeVar", bound="SmartProxyManagerFetchMiddleware")

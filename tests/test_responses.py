@@ -151,17 +151,17 @@ def test_process_response_error():
 
     logs.check_present(
         (
-            "crawlera-fetch-middleware",
+            "zyte-proxy-fetch-middleware",
             "WARNING",
             "Error downloading <GET https://example.org> (status: 200, X-Crawlera-Error header: bad_proxy_auth)",  # noqa: E501
         ),
         (
-            "crawlera-fetch-middleware",
+            "zyte-proxy-fetch-middleware",
             "WARNING",
             "Error decoding <GET https://example.org> (status: 200, message: Unterminated string starting at, lineno: 1, colno: 9)",  # noqa: E501
         ),
         (
-            "crawlera-fetch-middleware",
+            "zyte-proxy-fetch-middleware",
             "WARNING",
             "Error downloading <GET https://example.org> (Original status: 503, Fetch API error message: Server busy: too many outstanding requests, Request ID: unknown)",  # noqa: E501
         ),
