@@ -84,19 +84,25 @@ class SmartProxyManagerFetchMiddleware:
         except AttributeError:
             if not spider.crawler.settings.getbool("ZYTE_PROXY_FETCH_ENABLED"):
                 self.enabled = False
-                logger.info("Zyte Smart Proxy Manager Fetch disabled (ZYTE_PROXY_FETCH_ENABLED setting)")
+                logger.info(
+                    "Zyte Smart Proxy Manager Fetch disabled (ZYTE_PROXY_FETCH_ENABLED setting)"
+                )
                 return
         else:
             if not BaseSettings({"enabled": spider_attr}).getbool("enabled"):
                 self.enabled = False
-                logger.info("Zyte Smart Proxy Manager Fetch disabled (zyte_proxy_fetch_enabled spider attribute)")
+                logger.info(
+                    "Zyte Smart Proxy Manager Fetch disabled "
+                    "(zyte_proxy_fetch_enabled spider attribute)"
+                )
                 return
 
         self.enabled = True
         self._read_settings(spider.crawler.settings)
         if self.enabled:
             logger.info(
-                "Using Zyte Smart Proxy Manager Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
+                "Using Zyte Smart Proxy Manager Fetch API at %s with apikey %s***"
+                % (self.url, self.apikey[:5])
             )
 
     def spider_closed(self, spider, reason):
