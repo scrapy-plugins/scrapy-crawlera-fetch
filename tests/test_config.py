@@ -11,7 +11,7 @@ def test_disable_via_setting():
         name = "foo"
 
     foo_spider = FooSpider()
-    foo_spider.crawler = get_crawler(FooSpider, settings_dict={"ZYTE_PROXY_ENABLED": False})
+    foo_spider.crawler = get_crawler(FooSpider, settings_dict={"ZYTE_PROXY_FETCH_ENABLED": False})
     middleware = SmartProxyManagerFetchMiddleware.from_crawler(foo_spider.crawler)
     middleware.spider_opened(foo_spider)
     assert not middleware.enabled
@@ -59,7 +59,7 @@ def test_disable_override():
         zyte_proxy_fetch_enabled = False
 
     foo_spider = FooSpider()
-    foo_spider.crawler = get_crawler(FooSpider, settings_dict={"ZYTE_PROXY_ENABLED": True})
+    foo_spider.crawler = get_crawler(FooSpider, settings_dict={"ZYTE_PROXY_FETCH_ENABLED": True})
     middleware = SmartProxyManagerFetchMiddleware.from_crawler(foo_spider.crawler)
     middleware.spider_opened(foo_spider)
     assert not middleware.enabled
@@ -70,7 +70,7 @@ def test_no_apikey():
         name = "foo"
 
     foo_spider = FooSpider()
-    foo_spider.crawler = get_crawler(settings_dict={"ZYTE_PROXY_ENABLED": True})
+    foo_spider.crawler = get_crawler(settings_dict={"ZYTE_PROXY_FETCH_ENABLED": True})
     middleware = SmartProxyManagerFetchMiddleware.from_crawler(foo_spider.crawler)
     middleware.spider_opened(foo_spider)
     assert not middleware.enabled
