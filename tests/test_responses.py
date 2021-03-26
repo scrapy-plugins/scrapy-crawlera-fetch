@@ -12,6 +12,13 @@ from tests.data.responses import test_responses
 from tests.utils import foo_spider, get_test_middleware, mocked_time
 
 
+def test_process_response_disabled():
+    middleware = get_test_middleware(settings={"ZYTE_PROXY_FETCH_ENABLED": False})
+    for case in test_responses:
+        response = case["original"]
+        assert middleware.process_response(response.request, response, foo_spider) is response
+
+
 def test_process_response():
     middleware = get_test_middleware()
 
@@ -144,17 +151,17 @@ def test_process_response_error():
 
     logs.check_present(
         (
-            "crawlera-fetch-middleware",
+            "zyte-proxy-fetch-middleware",
             "WARNING",
             "Error downloading <GET https://example.org> (status: 200, X-Crawlera-Error header: bad_proxy_auth)",  # noqa: E501
         ),
         (
-            "crawlera-fetch-middleware",
+            "zyte-proxy-fetch-middleware",
             "WARNING",
             "Error decoding <GET https://example.org> (status: 200, message: Unterminated string starting at, lineno: 1, colno: 9)",  # noqa: E501
         ),
         (
-            "crawlera-fetch-middleware",
+            "zyte-proxy-fetch-middleware",
             "WARNING",
             "Error downloading <GET https://example.org> (Original status: 503, Fetch API error message: Server busy: too many outstanding requests, Request ID: unknown)",  # noqa: E501
         ),

@@ -44,7 +44,8 @@ Smart Proxy Manager middleware won't be able to handle them.
 ### Settings
 
 * `ZYTE_PROXY_FETCH_ENABLED` (type `bool`, default `False`). Whether or not the middleware will be enabled,
-    i.e. requests should be downloaded using the Smart Proxy Manager Fetch API
+    i.e. requests should be downloaded using the Smart Proxy Manager Fetch API. The `zyte_proxy_fetch_enabled` spider
+    attribute takes precedence over this setting.
 
 * `ZYTE_PROXY_FETCH_APIKEY` (type `str`). API key to be used to authenticate against the Smart Proxy Manager endpoint
     (mandatory if enabled)
@@ -66,6 +67,11 @@ Smart Proxy Manager middleware won't be able to handle them.
 * `ZYTE_PROXY_FETCH_DEFAULT_ARGS` (type `dict`, default `{}`)
     Default values to be sent to the Smart Proxy Manager Fetch API. For instance, set to `{"device": "mobile"}`
     to render all requests with a mobile profile.
+
+### Spider attributes
+
+* `zyte_proxy_fetch_enabled` (type `bool`, default `False`). Whether or not the middleware will be enabled.
+    Takes precedence over the `ZYTE_PROXY_FETCH_ENABLED` setting.
 
 ### Log formatter
 
