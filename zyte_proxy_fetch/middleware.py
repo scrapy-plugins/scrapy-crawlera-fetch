@@ -19,13 +19,13 @@ from scrapy.utils.reqser import request_from_dict, request_to_dict
 from w3lib.http import basic_auth_header
 
 
-logger = logging.getLogger("crawlera-fetch-middleware")
+logger = logging.getLogger("zyte-proxy-fetch-middleware")
 
 
-MiddlewareTypeVar = TypeVar("MiddlewareTypeVar", bound="CrawleraFetchMiddleware")
+MiddlewareTypeVar = TypeVar("MiddlewareTypeVar", bound="SmartProxyManagerFetchMiddleware")
 
 
-META_KEY = "crawlera_fetch"
+META_KEY = "zyte_proxy_fetch"
 
 
 class DownloadSlotPolicy(Enum):
@@ -34,11 +34,11 @@ class DownloadSlotPolicy(Enum):
     Default = "default"
 
 
-class CrawleraFetchException(Exception):
+class SmartProxyManagerFetchException(Exception):
     pass
 
 
-class CrawleraFetchMiddleware:
+class SmartProxyManagerFetchMiddleware:
     url = "http://fetch.crawlera.com:8010/fetch/v2/"
     apikey = ""
     enabled = False
@@ -58,71 +58,77 @@ class CrawleraFetchMiddleware:
         return middleware
 
     def _read_settings(self, settings):
-        if not settings.get("CRAWLERA_FETCH_APIKEY"):
+        if not settings.get("ZYTE_PROXY_FETCH_APIKEY"):
             self.enabled = False
-            logger.info("Crawlera Fetch API cannot be used without an apikey")
+            logger.info("Zyte Smart Proxy Manager Fetch API cannot be used without an apikey")
             return
 
-        self.apikey = settings["CRAWLERA_FETCH_APIKEY"]
-        self.apipass = settings.get("CRAWLERA_FETCH_APIPASS", "")
+        self.apikey = settings["ZYTE_PROXY_FETCH_APIKEY"]
+        self.apipass = settings.get("ZYTE_PROXY_FETCH_APIPASS", "")
         self.auth_header = basic_auth_header(self.apikey, self.apipass)
 
-        if settings.get("CRAWLERA_FETCH_URL"):
-            self.url = settings["CRAWLERA_FETCH_URL"]
+        if settings.get("ZYTE_PROXY_FETCH_URL"):
+            self.url = settings["ZYTE_PROXY_FETCH_URL"]
 
         self.download_slot_policy = settings.get(
-            "CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
+            "ZYTE_PROXY_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
         )
 
-        self.raise_on_error = settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR", True)
+        self.raise_on_error = settings.getbool("ZYTE_PROXY_FETCH_RAISE_ON_ERROR", True)
 
-        self.default_args = settings.getdict("CRAWLERA_FETCH_DEFAULT_ARGS", {})
+        self.default_args = settings.getdict("ZYTE_PROXY_FETCH_DEFAULT_ARGS", {})
 
     def spider_opened(self, spider):
         try:
-            spider_attr = getattr(spider, "crawlera_fetch_enabled")
+            spider_attr = getattr(spider, "zyte_proxy_fetch_enabled")
         except AttributeError:
-            if not spider.crawler.settings.getbool("CRAWLERA_FETCH_ENABLED"):
+            if not spider.crawler.settings.getbool("ZYTE_PROXY_FETCH_ENABLED"):
                 self.enabled = False
-                logger.info("Crawlera Fetch disabled (CRAWLERA_FETCH_ENABLED setting)")
+                logger.info(
+                    "Zyte Smart Proxy Manager Fetch disabled (ZYTE_PROXY_FETCH_ENABLED setting)"
+                )
                 return
         else:
             if not BaseSettings({"enabled": spider_attr}).getbool("enabled"):
                 self.enabled = False
-                logger.info("Crawlera Fetch disabled (crawlera_fetch_enabled spider attribute)")
+                logger.info(
+                    "Zyte Smart Proxy Manager Fetch disabled "
+                    "(zyte_proxy_fetch_enabled spider attribute)"
+                )
                 return
 
         self.enabled = True
         self._read_settings(spider.crawler.settings)
         if self.enabled:
             logger.info(
-                "Using Crawlera Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
+                "Using Zyte Smart Proxy Manager Fetch API at %s with apikey %s***"
+                % (self.url, self.apikey[:5])
             )
 
     def spider_closed(self, spider, reason):
         if self.enabled:
-            self.stats.set_value("crawlera_fetch/total_latency", self.total_latency)
-            response_count = self.stats.get_value("crawlera_fetch/response_count")
+            self.stats.set_value("zyte_proxy_fetch/total_latency", self.total_latency)
+            response_count = self.stats.get_value("zyte_proxy_fetch/response_count")
             if response_count:
                 avg_latency = self.total_latency / response_count
-                self.stats.set_value("crawlera_fetch/avg_latency", avg_latency)
+                self.stats.set_value("zyte_proxy_fetch/avg_latency", avg_latency)
 
     def process_request(self, request: Request, spider: Spider) -> Optional[Request]:
         if not self.enabled:
             return None
 
         try:
-            crawlera_meta = request.meta[META_KEY]
+            zyte_proxy_meta = request.meta[META_KEY]
         except KeyError:
-            crawlera_meta = {}
+            zyte_proxy_meta = {}
 
-        if crawlera_meta.get("skip") or crawlera_meta.get("original_request"):
+        if zyte_proxy_meta.get("skip") or zyte_proxy_meta.get("original_request"):
             return None
 
         self._set_download_slot(request, spider)
 
-        self.stats.inc_value("crawlera_fetch/request_count")
-        self.stats.inc_value("crawlera_fetch/request_method_count/{}".format(request.method))
+        self.stats.inc_value("zyte_proxy_fetch/request_count")
+        self.stats.inc_value("zyte_proxy_fetch/request_method_count/{}".format(request.method))
 
         shub_jobkey = os.environ.get("SHUB_JOBKEY")
         if shub_jobkey:
@@ -134,14 +140,14 @@ class CrawleraFetchMiddleware:
         if request.method != "GET":
             body["method"] = request.method
         body.update(self.default_args)
-        body.update(crawlera_meta.get("args") or {})
+        body.update(zyte_proxy_meta.get("args") or {})
         body_json = json.dumps(body)
 
         additional_meta = {
             "original_request": request_to_dict(request, spider=spider),
             "timing": {"start_ts": time.time()},
         }
-        crawlera_meta.update(additional_meta)
+        zyte_proxy_meta.update(additional_meta)
 
         additional_headers = {
             "Content-Type": "application/json",
@@ -159,7 +165,7 @@ class CrawleraFetchMiddleware:
             if original_url_flag not in request.flags:
                 request.flags.append(original_url_flag)
 
-        request.meta[META_KEY] = crawlera_meta
+        request.meta[META_KEY] = zyte_proxy_meta
         return request.replace(url=self.url, method="POST", body=body_json)
 
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
@@ -167,24 +173,24 @@ class CrawleraFetchMiddleware:
             return response
 
         try:
-            crawlera_meta = request.meta[META_KEY]
+            zyte_proxy_meta = request.meta[META_KEY]
         except KeyError:
-            crawlera_meta = {}
+            zyte_proxy_meta = {}
 
-        if crawlera_meta.get("skip") or not crawlera_meta.get("original_request"):
+        if zyte_proxy_meta.get("skip") or not zyte_proxy_meta.get("original_request"):
             return response
 
-        original_request = request_from_dict(crawlera_meta["original_request"], spider=spider)
+        original_request = request_from_dict(zyte_proxy_meta["original_request"], spider=spider)
 
-        self.stats.inc_value("crawlera_fetch/response_count")
+        self.stats.inc_value("zyte_proxy_fetch/response_count")
         self._calculate_latency(request)
 
-        self.stats.inc_value("crawlera_fetch/api_status_count/{}".format(response.status))
+        self.stats.inc_value("zyte_proxy_fetch/api_status_count/{}".format(response.status))
 
         if response.headers.get("X-Crawlera-Error"):
             message = response.headers["X-Crawlera-Error"].decode("utf8")
-            self.stats.inc_value("crawlera_fetch/response_error")
-            self.stats.inc_value("crawlera_fetch/response_error/{}".format(message))
+            self.stats.inc_value("zyte_proxy_fetch/response_error")
+            self.stats.inc_value("zyte_proxy_fetch/response_error/{}".format(message))
             log_msg = "Error downloading <{} {}> (status: {}, X-Crawlera-Error header: {})"
             log_msg = log_msg.format(
                 original_request.method,
@@ -193,7 +199,7 @@ class CrawleraFetchMiddleware:
                 message,
             )
             if self.raise_on_error:
-                raise CrawleraFetchException(log_msg)
+                raise SmartProxyManagerFetchException(log_msg)
             else:
                 logger.warning(log_msg)
                 return response
@@ -201,8 +207,8 @@ class CrawleraFetchMiddleware:
         try:
             json_response = json.loads(response.text)
         except json.JSONDecodeError as exc:
-            self.stats.inc_value("crawlera_fetch/response_error")
-            self.stats.inc_value("crawlera_fetch/response_error/JSONDecodeError")
+            self.stats.inc_value("zyte_proxy_fetch/response_error")
+            self.stats.inc_value("zyte_proxy_fetch/response_error/JSONDecodeError")
             log_msg = "Error decoding <{} {}> (status: {}, message: {}, lineno: {}, colno: {})"
             log_msg = log_msg.format(
                 original_request.method,
@@ -213,7 +219,7 @@ class CrawleraFetchMiddleware:
                 exc.colno,
             )
             if self.raise_on_error:
-                raise CrawleraFetchException(log_msg) from exc
+                raise SmartProxyManagerFetchException(log_msg) from exc
             else:
                 logger.warning(log_msg)
                 return response
@@ -223,8 +229,8 @@ class CrawleraFetchMiddleware:
         request_id = json_response.get("id") or json_response.get("uncork_id")
         if server_error:
             message = json_response.get("body") or json_response.get("message")
-            self.stats.inc_value("crawlera_fetch/response_error")
-            self.stats.inc_value("crawlera_fetch/response_error/{}".format(server_error))
+            self.stats.inc_value("zyte_proxy_fetch/response_error")
+            self.stats.inc_value("zyte_proxy_fetch/response_error/{}".format(server_error))
             log_msg = (
                 "Error downloading <{} {}> (Original status: {}, "
                 "Fetch API error message: {}, Request ID: {})"
@@ -237,14 +243,14 @@ class CrawleraFetchMiddleware:
                 request_id or "unknown",
             )
             if self.raise_on_error:
-                raise CrawleraFetchException(log_msg)
+                raise SmartProxyManagerFetchException(log_msg)
             else:
                 logger.warning(log_msg)
                 return response
 
-        self.stats.inc_value("crawlera_fetch/response_status_count/{}".format(original_status))
+        self.stats.inc_value("zyte_proxy_fetch/response_status_count/{}".format(original_status))
 
-        crawlera_meta["upstream_response"] = {
+        zyte_proxy_meta["upstream_response"] = {
             "status": response.status,
             "headers": response.headers,
             "body": json_response,
@@ -273,7 +279,7 @@ class CrawleraFetchMiddleware:
             slot = self.crawler.engine.downloader._get_slot_key(request, spider)
             request.meta["download_slot"] = slot
         elif self.download_slot_policy == DownloadSlotPolicy.Single:
-            request.meta["download_slot"] = "__crawlera_fetch__"
+            request.meta["download_slot"] = "__zyte_proxy_fetch__"
         # Otherwise use Scrapy default policy
 
     def _calculate_latency(self, request):
@@ -281,5 +287,7 @@ class CrawleraFetchMiddleware:
         timing["end_ts"] = time.time()
         timing["latency"] = timing["end_ts"] - timing["start_ts"]
         self.total_latency += timing["latency"]
-        max_latency = max(self.stats.get_value("crawlera_fetch/max_latency", 0), timing["latency"])
-        self.stats.set_value("crawlera_fetch/max_latency", max_latency)
+        max_latency = max(
+            self.stats.get_value("zyte_proxy_fetch/max_latency", 0), timing["latency"]
+        )
+        self.stats.set_value("zyte_proxy_fetch/max_latency", max_latency)

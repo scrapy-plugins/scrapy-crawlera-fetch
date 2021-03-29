@@ -6,15 +6,15 @@ with open("README.md", "r") as fh:
 
 
 setuptools.setup(
-    name="scrapy-crawlera-fetch",
+    name="scrapy-zyte-proxy-fetch",
     version="0.0.1",
     license="BSD",
-    description="Scrapy downloader middleware to interact with Crawlera Simple Fetch API",
+    description="Scrapy downloader middleware to interact with Zyte Smart Proxy Manager Fetch API",
     long_description=long_description,
-    author="Scrapinghub",
-    author_email="info@scrapinghub.com",
-    url="https://github.com/scrapy-plugins/scrapy-crawlera-fetch",
-    packages=["crawlera_fetch"],
+    author="Zyte",
+    author_email="opensource@zyte.com",
+    url="https://github.com/scrapy-plugins/scrapy-zyte-proxy-fetch",
+    packages=["zyte_proxy_fetch"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "License :: OSI Approved :: BSD License",

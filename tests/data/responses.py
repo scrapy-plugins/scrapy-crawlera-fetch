@@ -15,7 +15,7 @@ test_responses = []
 test_responses.append(
     {
         "original": HtmlResponse(
-            url=SETTINGS["CRAWLERA_FETCH_URL"],
+            url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
@@ -26,9 +26,9 @@ test_responses.append(
                 "Connection": "close",
             },
             request=Request(
-                url=SETTINGS["CRAWLERA_FETCH_URL"],
+                url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
                 meta={
-                    "crawlera_fetch": {
+                    "zyte_proxy_fetch": {
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://fake.host.com"),
@@ -51,7 +51,7 @@ test_responses.append(
 test_responses.append(
     {
         "original": HtmlResponse(
-            url=SETTINGS["CRAWLERA_FETCH_URL"],
+            url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
@@ -62,9 +62,9 @@ test_responses.append(
                 "Connection": "close",
             },
             request=Request(
-                url=SETTINGS["CRAWLERA_FETCH_URL"],
+                url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
                 meta={
-                    "crawlera_fetch": {
+                    "zyte_proxy_fetch": {
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://httpbin.org/get"),
@@ -97,7 +97,7 @@ test_responses.append(
 test_responses.append(
     {
         "original": HtmlResponse(
-            url=SETTINGS["CRAWLERA_FETCH_URL"],
+            url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
@@ -108,9 +108,9 @@ test_responses.append(
                 "Connection": "close",
             },
             request=Request(
-                url=SETTINGS["CRAWLERA_FETCH_URL"],
+                url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
                 meta={
-                    "crawlera_fetch": {
+                    "zyte_proxy_fetch": {
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("https://example.org"),
@@ -164,7 +164,7 @@ response_body_test = b"<html>Hello middleware test!</html>"
 test_responses.append(
     {
         "original": HtmlResponse(
-            url=SETTINGS["CRAWLERA_FETCH_URL"],
+            url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
             status=200,
             headers={
                 "Content-Type": "application/json",
@@ -172,9 +172,9 @@ test_responses.append(
                 "Date": "Fri, 24 Apr 2020 18:22:10 GMT",
             },
             request=Request(
-                url=SETTINGS["CRAWLERA_FETCH_URL"],
+                url=SETTINGS["ZYTE_PROXY_FETCH_URL"],
                 meta={
-                    "crawlera_fetch": {
+                    "zyte_proxy_fetch": {
                         "timing": {"start_ts": mocked_time()},
                         "original_request": request_to_dict(
                             Request("http://httpbin.org/ip"),
