@@ -66,9 +66,9 @@ def test_process_response_skip():
 def test_process_response_error():
     response_list = [
         TextResponse(
-            url="https://crawlera.com/fake/api/endpoint",
+            url="https://zyte.com/fake/api/endpoint",
             request=Request(
-                url="https://crawlera.com/fake/api/endpoint",
+                url="https://zyte.com/fake/api/endpoint",
                 meta={
                     "zyte_proxy_fetch": {
                         "timing": {"start_ts": mocked_time()},
@@ -89,9 +89,9 @@ def test_process_response_error():
             },
         ),
         TextResponse(
-            url="https://crawlera.com/fake/api/endpoint",
+            url="https://zyte.com/fake/api/endpoint",
             request=Request(
-                url="https://crawlera.com/fake/api/endpoint",
+                url="https://zyte.com/fake/api/endpoint",
                 meta={
                     "zyte_proxy_fetch": {
                         "timing": {"start_ts": mocked_time()},
@@ -105,9 +105,9 @@ def test_process_response_error():
             body=b'{"Bad": "JSON',
         ),
         TextResponse(
-            url="https://crawlera.com/fake/api/endpoint",
+            url="https://zyte.com/fake/api/endpoint",
             request=Request(
-                url="https://crawlera.com/fake/api/endpoint",
+                url="https://zyte.com/fake/api/endpoint",
                 meta={
                     "zyte_proxy_fetch": {
                         "timing": {"start_ts": mocked_time()},
