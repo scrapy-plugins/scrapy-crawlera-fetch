@@ -57,7 +57,8 @@ class CrawleraFetchMiddleware:
         middleware.total_latency = 0
         return middleware
 
-    def _read_settings(self, settings):
+    def _read_settings(self, spider: Spider) -> None:
+        settings = spider.crawler.settings
         if not settings.get("CRAWLERA_FETCH_APIKEY"):
             self.enabled = False
             logger.info("Crawlera Fetch API cannot be used without an apikey")
@@ -93,13 +94,13 @@ class CrawleraFetchMiddleware:
                 return
 
         self.enabled = True
-        self._read_settings(spider.crawler.settings)
+        self._read_settings(spider)
         if self.enabled:
             logger.info(
                 "Using Crawlera Fetch API at %s with apikey %s***" % (self.url, self.apikey[:5])
             )
 
-    def spider_closed(self, spider, reason):
+    def spider_closed(self, spider: Spider, reason: str) -> None:
         if self.enabled:
             self.stats.set_value("crawlera_fetch/total_latency", self.total_latency)
             response_count = self.stats.get_value("crawlera_fetch/response_count")
@@ -268,7 +269,7 @@ class CrawleraFetchMiddleware:
             status=original_status or 200,
         )
 
-    def _set_download_slot(self, request, spider):
+    def _set_download_slot(self, request: Request, spider: Spider) -> None:
         if self.download_slot_policy == DownloadSlotPolicy.Domain:
             slot = self.crawler.engine.downloader._get_slot_key(request, spider)
             request.meta["download_slot"] = slot
@@ -276,7 +277,7 @@ class CrawleraFetchMiddleware:
             request.meta["download_slot"] = "__crawlera_fetch__"
         # Otherwise use Scrapy default policy
 
-    def _calculate_latency(self, request):
+    def _calculate_latency(self, request: Request) -> None:
         timing = request.meta[META_KEY]["timing"]
         timing["end_ts"] = time.time()
         timing["latency"] = timing["end_ts"] - timing["start_ts"]
