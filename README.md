@@ -45,9 +45,9 @@ Crawlera middleware won't be able to handle them.
 
 * `CRAWLERA_FETCH_ENABLED` (type `bool`, default `False`)
 
-    Whether or not the middleware will be enabled,
-    i.e. requests should be downloaded using the Crawlera Fetch API. The `crawlera_fetch_enabled`
-    spider attribute takes precedence over this setting.
+    Whether or not the middleware will be enabled, i.e. requests should be downloaded using
+    the Crawlera Fetch API. The `crawlera_fetch_enabled` spider attribute takes precedence
+    over this setting.
 
 * `CRAWLERA_FETCH_APIKEY` (type `str`)
 
@@ -59,9 +59,9 @@ Crawlera middleware won't be able to handle them.
 
 * `CRAWLERA_FETCH_RAISE_ON_ERROR` (type `bool`, default `True`)
 
-    Whether or not the middleware will
-    raise an exception if an error occurs while downloading or decoding a request. If `False`, a
-    warning will be logged and the raw upstream response will be returned upon encountering an error.
+    Whether or not the middleware will raise an exception if an error occurs while downloading
+    or decoding a response. If `False`, a warning will be logged and the raw upstream response
+    will be returned upon encountering an error.
 
 * `CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY` (type `enum.Enum` - `crawlera_fetch.DownloadSlotPolicy`,
     default `DownloadSlotPolicy.Domain`)
@@ -69,7 +69,7 @@ Crawlera middleware won't be able to handle them.
     Possible values are `DownloadSlotPolicy.Domain`, `DownloadSlotPolicy.Single`,
     `DownloadSlotPolicydefault` (Scrapy default). If set to `DownloadSlotPolicy.Domain`, please
     consider setting `SCHEDULER_PRIORITY_QUEUE="scrapy.pqueues.DownloaderAwarePriorityQueue"` to
-    make better usage of concurrency options and avoid delays.
+    make better usage of concurrency options and avoiding delays.
 
 * `CRAWLERA_FETCH_DEFAULT_ARGS` (type `dict`, default `{}`)
 
