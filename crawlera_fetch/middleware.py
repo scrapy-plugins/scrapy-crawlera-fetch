@@ -5,7 +5,7 @@ import logging
 import os
 import time
 from enum import Enum
-from typing import Optional, Type, TypeVar
+from typing import Callable, Optional, Type, TypeVar
 
 import scrapy
 from scrapy.crawler import Crawler
@@ -74,10 +74,30 @@ class CrawleraFetchMiddleware:
         self.download_slot_policy = settings.get(
             "CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
         )
-
         self.raise_on_error = settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR", True)
-
         self.default_args = settings.getdict("CRAWLERA_FETCH_DEFAULT_ARGS", {})
+
+        self.should_retry = settings.get("CRAWLERA_FETCH_SHOULD_RETRY")
+        if isinstance(self.should_retry, str):
+            try:
+                self.should_retry = getattr(spider, self.should_retry)
+            except AttributeError:
+                logger.info(
+                    "Could not find a callable named '%s' on the spider - retries are disabled",
+                    self.should_retry,
+                )
+                self.should_retry = None
+        elif not isinstance(self.should_retry, Callable):  # type: ignore
+            logger.info(
+                "Invalid type for retry function: expected Callable"
+                " or str, got %s - retries are disabled",
+                type(self.should_retry),
+            )
+            self.should_retry = None
+        if self.should_retry is not None:
+            self.retry_times = settings.getint("CRAWLERA_FETCH_RETRY_TIMES")
+            if not self.retry_times:
+                self.retry_times = settings.getint("RETRY_TIMES")
 
     def spider_opened(self, spider):
         try:

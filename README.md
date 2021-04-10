@@ -68,6 +68,17 @@ Crawlera middleware won't be able to handle them.
     Default values to be sent to the Crawlera Fetch API. For instance, set to `{"device": "mobile"}`
     to render all requests with a mobile profile.
 
+* `CRAWLERA_FETCH_SHOULD_RETRY` (type `Optional[Callable, str]`, default `None`)
+    A boolean callable that determines whether a request should be retried by the middleware.
+    If the setting value is a `str`, an attribute by that name will be looked up on the spider
+    object doing the crawl. The callable should accept the following arguments:
+    `response: scrapy.http.response.Response, request: scrapy.http.request.Request, spider: scrapy.spiders.Spider`.
+    If the return value evaluates to `True`, the request will be retried by the middleware.
+
+* `CRAWLERA_FETCH_RETRY_TIMES` (type `Optional[int]`, default `None`)
+    The maximum number of times a request should be retried.
+    If `None`, the value is taken from the `RETRY_TIMES` setting.
+
 ### Spider attributes
 
 * `crawlera_fetch_enabled` (type `bool`, default `False`). Whether or not the middleware will be enabled.
