@@ -4,11 +4,13 @@ import json
 import logging
 import os
 import time
+import warnings
 from enum import Enum
-from typing import Callable, Optional, Type, TypeVar
+from typing import Callable, Optional, Type, TypeVar, Union
 
 import scrapy
 from scrapy.crawler import Crawler
+from scrapy.exceptions import ScrapyDeprecationWarning
 from scrapy.http.request import Request
 from scrapy.http.response import Response
 from scrapy.responsetypes import responsetypes
@@ -37,6 +39,12 @@ class DownloadSlotPolicy(Enum):
     Domain = "domain"
     Single = "single"
     Default = "default"
+
+
+class OnError(Enum):
+    Warn = "warn"
+    Raise = "raise"
+    Retry = "retry"
 
 
 class CrawleraFetchException(Exception):
@@ -79,9 +87,30 @@ class CrawleraFetchMiddleware:
         self.download_slot_policy = settings.get(
             "CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
         )
-        self.raise_on_error = settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR", True)
         self.default_args = settings.getdict("CRAWLERA_FETCH_DEFAULT_ARGS", {})
 
+        # what to do when an error hapepns?
+        self.on_error_action: Optional[OnError] = None
+        if "CRAWLERA_FETCH_RAISE_ON_ERROR" in settings:
+            warnings.warn(
+                "CRAWLERA_FETCH_RAISE_ON_ERROR is deprecated, "
+                "please use CRAWLERA_FETCH_ON_ERROR instead",
+                category=ScrapyDeprecationWarning,
+                stacklevel=2,
+            )
+            if settings.getbool("CRAWLERA_FETCH_RAISE_ON_ERROR"):
+                self.on_error_action = OnError.Raise
+            else:
+                self.on_error_action = OnError.Warn
+        if "CRAWLERA_FETCH_ON_ERROR" in settings:
+            self.on_error_action = settings.get("CRAWLERA_FETCH_ON_ERROR")
+        if self.on_error_action == OnError.Retry and get_retry_request is None:
+            logger.warning("Cannot retry on error, Scrapy>=2.5 required")
+            self.on_error_action = None
+        if self.on_error_action is None:
+            self.on_error_action = OnError.Raise
+
+        # should retry?
         self.should_retry = settings.get("CRAWLERA_FETCH_SHOULD_RETRY")
         if self.should_retry is not None:
             if get_retry_request is None:
@@ -192,6 +221,18 @@ class CrawleraFetchMiddleware:
         request.meta[META_KEY] = crawlera_meta
         return request.replace(url=self.url, method="POST", body=body_json)
 
+    def _get_retry_request(
+        self, request: Request, reason: Union[Exception, str], stats_base_key: str,
+    ) -> Optional[Request]:
+        return get_retry_request(
+            request=request,
+            reason=reason,
+            stats_base_key=stats_base_key,
+            spider=self.crawler.spider,
+            max_retry_times=self.retry_times,
+            logger=logger,
+        )
+
     def process_response(self, request: Request, response: Response, spider: Spider) -> Response:
         if not self.enabled:
             return response
@@ -222,11 +263,17 @@ class CrawleraFetchMiddleware:
                 response.status,
                 message,
             )
-            if self.raise_on_error:
+            if self.on_error_action == OnError.Raise:
                 raise CrawleraFetchException(log_msg)
-            else:
+            elif self.on_error_action == OnError.Warn:
                 logger.warning(log_msg)
                 return response
+            elif self.on_error_action == OnError.Retry:
+                return self._get_retry_request(
+                    request=request,
+                    reason=message,
+                    stats_base_key="crawlera_fetch/retry/error",
+                )
 
         try:
             json_response = json.loads(response.text)
@@ -242,14 +289,22 @@ class CrawleraFetchMiddleware:
                 exc.lineno,
                 exc.colno,
             )
-            if self.raise_on_error:
+            if self.on_error_action == OnError.Raise:
                 raise CrawleraFetchException(log_msg) from exc
-            else:
+            elif self.on_error_action == OnError.Warn:
                 logger.warning(log_msg)
                 return response
+            elif self.on_error_action == OnError.Retry:
+                return self._get_retry_request(
+                    request=request,
+                    reason=exc,
+                    stats_base_key="crawlera_fetch/retry/error",
+                )
+
+        original_status = json_response.get("original_status")
+        self.stats.inc_value("crawlera_fetch/response_status_count/{}".format(original_status))
 
         server_error = json_response.get("crawlera_error") or json_response.get("error_code")
-        original_status = json_response.get("original_status")
         request_id = json_response.get("id") or json_response.get("uncork_id")
         if server_error:
             message = json_response.get("body") or json_response.get("message")
@@ -266,13 +321,17 @@ class CrawleraFetchMiddleware:
                 message,
                 request_id or "unknown",
             )
-            if self.raise_on_error:
+            if self.on_error_action == OnError.Raise:
                 raise CrawleraFetchException(log_msg)
-            else:
+            elif self.on_error_action == OnError.Warn:
                 logger.warning(log_msg)
                 return response
-
-        self.stats.inc_value("crawlera_fetch/response_status_count/{}".format(original_status))
+            elif self.on_error_action == OnError.Retry:
+                return self._get_retry_request(
+                    request=request,
+                    reason=server_error,
+                    stats_base_key="crawlera_fetch/retry/error",
+                )
 
         crawlera_meta["upstream_response"] = {
             "status": response.status,

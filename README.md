@@ -57,7 +57,18 @@ Crawlera middleware won't be able to handle them.
 
     The endpoint of a specific Crawlera instance
 
+* `CRAWLERA_FETCH_ON_ERROR` (type `enum.Enum` - `crawlera_fetch.OnError`,
+    default `OnError.Raise`)
+
+    What to do if an error occurs while downloading or decoding a response. Possible values are:
+    * `OnError.Raise` (raise a `crawlera_fetch.CrawleraFetchException` exception)
+    * `OnError.Warn` (log a warning and return the raw upstream response)
+    * `OnError.Retry` (retry the failed request, up to `CRAWLERA_FETCH_RETRY_TIMES` times -
+    Requires Scrapy>=2.5)
+
 * `CRAWLERA_FETCH_RAISE_ON_ERROR` (type `bool`, default `True`)
+
+    **_Deprecated, please use `CRAWLERA_FETCH_ON_ERROR`_**
 
     Whether or not the middleware will raise an exception if an error occurs while downloading
     or decoding a response. If `False`, a warning will be logged and the raw upstream response
