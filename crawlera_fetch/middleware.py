@@ -23,15 +23,18 @@ from w3lib.http import basic_auth_header
 try:
     from scrapy.downloadermiddlewares.retry import get_retry_request
 except ImportError:
-    get_retry_request = None
+    from crawlera_fetch.utils import _get_retry_request as get_retry_request
 
+
+__all__ = [
+    "CrawleraFetchException",
+    "CrawleraFetchMiddleware",
+    "DownloadSlotPolicy",
+    "OnError",
+]
 
 logger = logging.getLogger("crawlera-fetch-middleware")
-
-
 MiddlewareTypeVar = TypeVar("MiddlewareTypeVar", bound="CrawleraFetchMiddleware")
-
-
 META_KEY = "crawlera_fetch"
 
 
@@ -104,19 +107,13 @@ class CrawleraFetchMiddleware:
                 self.on_error_action = OnError.Warn
         if "CRAWLERA_FETCH_ON_ERROR" in settings:
             self.on_error_action = settings.get("CRAWLERA_FETCH_ON_ERROR")
-        if self.on_error_action == OnError.Retry and get_retry_request is None:
-            logger.warning("Cannot retry on error, Scrapy>=2.5 required")
-            self.on_error_action = None
         if self.on_error_action is None:
             self.on_error_action = OnError.Raise
 
         # should retry?
         self.should_retry = settings.get("CRAWLERA_FETCH_SHOULD_RETRY")
         if self.should_retry is not None:
-            if get_retry_request is None:
-                logger.warning("Retry feature disabled, Scrapy>=2.5 required")
-                self.should_retry = None
-            elif isinstance(self.should_retry, str):
+            if isinstance(self.should_retry, str):
                 try:
                     self.should_retry = getattr(spider, self.should_retry)
                 except AttributeError:
@@ -125,17 +122,16 @@ class CrawleraFetchMiddleware:
                         self.should_retry,
                     )
                     self.should_retry = None
-            elif not isinstance(self.should_retry, Callable):  # type: ignore
+            elif not isinstance(self.should_retry, Callable):  # type: ignore[arg-type]
                 logger.warning(
                     "Invalid type for retry function: expected Callable"
                     " or str, got %s - retries are disabled",
                     type(self.should_retry),
                 )
                 self.should_retry = None
-        if self.should_retry is not None:
-            self.retry_times = settings.getint("CRAWLERA_FETCH_RETRY_TIMES")
-            if not self.retry_times:
-                self.retry_times = settings.getint("RETRY_TIMES")
+        self.retry_times = settings.getint("CRAWLERA_FETCH_RETRY_TIMES")
+        if not self.retry_times:
+            self.retry_times = settings.getint("RETRY_TIMES")
 
     def spider_opened(self, spider):
         try:

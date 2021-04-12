@@ -63,8 +63,7 @@ Crawlera middleware won't be able to handle them.
     What to do if an error occurs while downloading or decoding a response. Possible values are:
     * `OnError.Raise` (raise a `crawlera_fetch.CrawleraFetchException` exception)
     * `OnError.Warn` (log a warning and return the raw upstream response)
-    * `OnError.Retry` (retry the failed request, up to `CRAWLERA_FETCH_RETRY_TIMES` times -
-    Requires Scrapy>=2.5)
+    * `OnError.Retry` (retry the failed request, up to `CRAWLERA_FETCH_RETRY_TIMES` times)
 
 * `CRAWLERA_FETCH_RAISE_ON_ERROR` (type `bool`, default `True`)
 
@@ -88,8 +87,6 @@ Crawlera middleware won't be able to handle them.
     to render all requests with a mobile profile.
 
 * `CRAWLERA_FETCH_SHOULD_RETRY` (type `Optional[Callable, str]`, default `None`)
-
-    **_Requires Scrapy>=2.5_**
 
     A boolean callable that determines whether a request should be retried by the middleware.
     If the setting value is a `str`, an attribute by that name will be looked up on the spider
