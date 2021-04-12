@@ -90,7 +90,7 @@ class CrawleraFetchMiddleware:
         self.default_args = settings.getdict("CRAWLERA_FETCH_DEFAULT_ARGS", {})
 
         # what to do when an error hapepns?
-        self.on_error_action: Optional[OnError] = None
+        self.on_error_action = None  # type: Optional[OnError]
         if "CRAWLERA_FETCH_RAISE_ON_ERROR" in settings:
             warnings.warn(
                 "CRAWLERA_FETCH_RAISE_ON_ERROR is deprecated, "
@@ -222,7 +222,10 @@ class CrawleraFetchMiddleware:
         return request.replace(url=self.url, method="POST", body=body_json)
 
     def _get_retry_request(
-        self, request: Request, reason: Union[Exception, str], stats_base_key: str,
+        self,
+        request: Request,
+        reason: Union[Exception, str],
+        stats_base_key: str,
     ) -> Optional[Request]:
         return get_retry_request(
             request=request,
