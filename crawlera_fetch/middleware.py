@@ -351,7 +351,7 @@ class CrawleraFetchMiddleware:
             url=json_response["url"],
             body=resp_body,
         )
-        return response.replace(
+        response = response.replace(
             cls=respcls,
             request=original_request,
             headers=json_response["headers"],
@@ -359,6 +359,14 @@ class CrawleraFetchMiddleware:
             body=resp_body,
             status=original_status or 200,
         )
+        if self.should_retry is not None:
+            if self.should_retry(response=response, request=request, spider=spider):
+                return self._get_retry_request(
+                    request=request,
+                    reason="should-retry",
+                    stats_base_key="crawlera_fetch/retry/should-retry",
+                )
+        return response
 
     def _set_download_slot(self, request: Request, spider: Spider) -> None:
         if self.download_slot_policy == DownloadSlotPolicy.Domain:
