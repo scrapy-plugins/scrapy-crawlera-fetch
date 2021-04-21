@@ -23,7 +23,7 @@ from w3lib.http import basic_auth_header
 try:
     from scrapy.downloadermiddlewares.retry import get_retry_request
 except ImportError:
-    from crawlera_fetch.utils import _get_retry_request as get_retry_request
+    from crawlera_fetch._utils import _get_retry_request as get_retry_request
 
 
 __all__ = [
