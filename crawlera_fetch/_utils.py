@@ -14,7 +14,7 @@ def _get_retry_request(
     priority_adjust: Optional[int] = None,
     logger: Logger,
     stats_base_key: str,
-):
+) -> Optional[Request]:
     """
     Fallback implementation, taken verbatim from https://github.com/scrapy/scrapy/pull/4902
     """
