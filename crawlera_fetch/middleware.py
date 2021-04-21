@@ -118,14 +118,14 @@ class CrawleraFetchMiddleware:
                     self.should_retry = getattr(spider, self.should_retry)
                 except AttributeError:
                     logger.warning(
-                        "Could not find a '%s' callable on the spider - retries are disabled",
+                        "Could not find a '%s' callable on the spider - user retries are disabled",
                         self.should_retry,
                     )
                     self.should_retry = None
             elif not isinstance(self.should_retry, Callable):  # type: ignore[arg-type]
                 logger.warning(
                     "Invalid type for retry function: expected Callable"
-                    " or str, got %s - retries are disabled",
+                    " or str, got %s - user retries are disabled",
                     type(self.should_retry),
                 )
                 self.should_retry = None
