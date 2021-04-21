@@ -18,8 +18,8 @@ def test_process_response_should_retry_function():
         assert result.url == response.request.url
 
     base_key = "crawlera_fetch/retry/should-retry"
-    assert middleware.stats.get_value(f"{base_key}/count") == 4
-    assert middleware.stats.get_value(f"{base_key}/reason_count/should-retry") == 4
+    assert middleware.stats.get_value(base_key + "/count") == 4
+    assert middleware.stats.get_value(base_key + "/reason_count/should-retry") == 4
 
 
 def test_process_response_should_retry_spider_method():
@@ -31,8 +31,8 @@ def test_process_response_should_retry_spider_method():
         assert result.url == response.request.url
 
     base_key = "crawlera_fetch/retry/should-retry"
-    assert middleware.stats.get_value(f"{base_key}/count") == 4
-    assert middleware.stats.get_value(f"{base_key}/reason_count/should-retry") == 4
+    assert middleware.stats.get_value(base_key + "/count") == 4
+    assert middleware.stats.get_value(base_key + "/reason_count/should-retry") == 4
 
 
 def test_process_response_error():
@@ -43,7 +43,7 @@ def test_process_response_error():
         assert result.url == response.request.url
 
     base_key = "crawlera_fetch/retry/error"
-    assert middleware.stats.get_value(f"{base_key}/count") == 3
-    assert middleware.stats.get_value(f"{base_key}/reason_count/bad_proxy_auth") == 1
-    assert middleware.stats.get_value(f"{base_key}/reason_count/json.decoder.JSONDecodeError") == 1
-    assert middleware.stats.get_value(f"{base_key}/reason_count/serverbusy") == 1
+    assert middleware.stats.get_value(base_key + "/count") == 3
+    assert middleware.stats.get_value(base_key + "/reason_count/bad_proxy_auth") == 1
+    assert middleware.stats.get_value(base_key + "/reason_count/json.decoder.JSONDecodeError") == 1
+    assert middleware.stats.get_value(base_key + "/reason_count/serverbusy") == 1

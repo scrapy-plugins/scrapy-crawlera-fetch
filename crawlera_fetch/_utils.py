@@ -5,6 +5,8 @@ from scrapy import Request, Spider
 from scrapy.utils.python import global_object_name
 
 
+# disable black formatting to avoid syntax error on py35
+# fmt: off
 def _get_retry_request(
     request: Request,
     *,
@@ -13,8 +15,9 @@ def _get_retry_request(
     max_retry_times: Optional[int] = None,
     priority_adjust: Optional[int] = None,
     logger: Logger,
-    stats_base_key: str,
+    stats_base_key: str  # black wants to put a comma at the end, but py35 doesn't like it
 ) -> Optional[Request]:
+    # fmt: on
     """
     Fallback implementation, taken verbatim from https://github.com/scrapy/scrapy/pull/4902
     """
@@ -43,11 +46,11 @@ def _get_retry_request(
         if isinstance(reason, Exception):
             reason = global_object_name(reason.__class__)
 
-        stats.inc_value(f"{stats_base_key}/count")
-        stats.inc_value(f"{stats_base_key}/reason_count/{reason}")
+        stats.inc_value("{}/count".format(stats_base_key))
+        stats.inc_value("{}/reason_count/{}".format(stats_base_key, reason))
         return new_request
     else:
-        stats.inc_value(f"{stats_base_key}/max_reached")
+        stats.inc_value("{}/max_reached".format(stats_base_key))
         logger.error(
             "Gave up retrying %(request)s (failed %(retry_times)d times): " "%(reason)s",
             {"request": request, "retry_times": retry_times, "reason": reason},
