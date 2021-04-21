@@ -133,7 +133,7 @@ class CrawleraFetchMiddleware:
         if not self.retry_times:
             self.retry_times = settings.getint("RETRY_TIMES")
 
-    def spider_opened(self, spider):
+    def spider_opened(self, spider: Spider) -> None:
         try:
             spider_attr = getattr(spider, "crawlera_fetch_enabled")
         except AttributeError:
