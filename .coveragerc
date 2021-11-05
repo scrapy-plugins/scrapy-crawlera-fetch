@@ -1,2 +1,2 @@
 [run]
-omit = crawlera_fetch/_utils.py
+omit = crawlera_fetch/_utils.py  # already tested in upstream Scrapy

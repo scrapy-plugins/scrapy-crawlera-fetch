@@ -21,7 +21,7 @@ from scrapy.utils.reqser import request_from_dict, request_to_dict
 from w3lib.http import basic_auth_header
 
 try:
-    from scrapy.downloadermiddlewares.retry import get_retry_request
+    from scrapy.downloadermiddlewares.retry import get_retry_request  # available on Scrapy >= 2.5
 except ImportError:
     from crawlera_fetch._utils import _get_retry_request as get_retry_request
 
