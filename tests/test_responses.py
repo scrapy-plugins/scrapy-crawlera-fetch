@@ -74,6 +74,27 @@ def test_process_response_error():
     assert middleware.stats.get_value("crawlera_fetch/response_error/serverbusy") == 1
 
 
+def test_process_response_error_default_raise():
+    with LogCapture() as logs:
+        middleware = get_test_middleware(settings={"CRAWLERA_FETCH_ON_ERROR": "invalid"})
+    logs.check_present(
+        (
+            "crawlera-fetch-middleware",
+            "WARNING",
+            "Invalid type for CRAWLERA_FETCH_ON_ERROR setting: expected crawlera_fetch.OnError, got <class 'str'>",  # noqa: E501
+        ),
+    )
+
+    for response in get_test_responses_error():
+        with pytest.raises(CrawleraFetchException):
+            middleware.process_response(response.request, response, foo_spider)
+
+    assert middleware.stats.get_value("crawlera_fetch/response_error") == 3
+    assert middleware.stats.get_value("crawlera_fetch/response_error/bad_proxy_auth") == 1
+    assert middleware.stats.get_value("crawlera_fetch/response_error/JSONDecodeError") == 1
+    assert middleware.stats.get_value("crawlera_fetch/response_error/serverbusy") == 1
+
+
 def test_process_response_warn():
     with LogCapture() as logs:
         middleware = get_test_middleware(settings={"CRAWLERA_FETCH_ON_ERROR": OnError.Warn})

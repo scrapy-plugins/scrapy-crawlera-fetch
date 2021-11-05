@@ -92,7 +92,7 @@ class CrawleraFetchMiddleware:
         )
         self.default_args = settings.getdict("CRAWLERA_FETCH_DEFAULT_ARGS", {})
 
-        # what to do when an error hapepns?
+        # what to do when errors happen?
         self.on_error_action = None  # type: Optional[OnError]
         if "CRAWLERA_FETCH_RAISE_ON_ERROR" in settings:
             warnings.warn(
@@ -106,11 +106,18 @@ class CrawleraFetchMiddleware:
             else:
                 self.on_error_action = OnError.Warn
         if "CRAWLERA_FETCH_ON_ERROR" in settings:
-            self.on_error_action = settings.get("CRAWLERA_FETCH_ON_ERROR")
+            if isinstance(settings["CRAWLERA_FETCH_ON_ERROR"], OnError):
+                self.on_error_action = settings["CRAWLERA_FETCH_ON_ERROR"]
+            else:
+                logger.warning(
+                    "Invalid type for CRAWLERA_FETCH_ON_ERROR setting:"
+                    " expected crawlera_fetch.OnError, got %s",
+                    type(settings["CRAWLERA_FETCH_ON_ERROR"]),
+                )
         if self.on_error_action is None:
             self.on_error_action = OnError.Raise
 
-        # should retry?
+        # should we retry?
         self.should_retry = settings.get("CRAWLERA_FETCH_SHOULD_RETRY")
         if self.should_retry is not None:
             if isinstance(self.should_retry, str):
@@ -273,6 +280,8 @@ class CrawleraFetchMiddleware:
                     reason=message,
                     stats_base_key="crawlera_fetch/retry/error",
                 )
+            else:
+                raise Exception("Invalid CRAWLERA_FETCH_ON_ERROR setting")
 
         try:
             json_response = json.loads(response.text)
@@ -299,6 +308,8 @@ class CrawleraFetchMiddleware:
                     reason=exc,
                     stats_base_key="crawlera_fetch/retry/error",
                 )
+            else:
+                raise Exception("Invalid CRAWLERA_FETCH_ON_ERROR setting")
 
         original_status = json_response.get("original_status")
         self.stats.inc_value("crawlera_fetch/response_status_count/{}".format(original_status))
@@ -331,6 +342,8 @@ class CrawleraFetchMiddleware:
                     reason=server_error,
                     stats_base_key="crawlera_fetch/retry/error",
                 )
+            else:
+                raise Exception("Invalid CRAWLERA_FETCH_ON_ERROR setting")
 
         crawlera_meta["upstream_response"] = {
             "status": response.status,
