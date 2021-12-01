@@ -260,6 +260,9 @@ class CrawleraFetchMiddleware:
             url=json_response["url"],
             body=resp_body,
         )
+
+        original_request = original_request.replace(url=json_response["url"])
+
         return response.replace(
             cls=respcls,
             request=original_request,
