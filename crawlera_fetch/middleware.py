@@ -13,6 +13,7 @@ from scrapy.http.request import Request
 from scrapy.http.response import Response
 from scrapy.responsetypes import responsetypes
 from scrapy.settings import BaseSettings
+from scrapy.http import Headers
 from scrapy.spiders import Spider
 from scrapy.statscollectors import StatsCollector
 from scrapy.utils.reqser import request_from_dict, request_to_dict
@@ -254,16 +255,16 @@ class CrawleraFetchMiddleware:
             resp_body = base64.b64decode(json_response["body"], validate=True)
         except (binascii.Error, ValueError):
             resp_body = json_response["body"]
-
+        headers = Headers(json_response["headers"])
         respcls = responsetypes.from_args(
-            headers=json_response["headers"],
+            headers=headers,
             url=json_response["url"],
             body=resp_body,
         )
         return response.replace(
             cls=respcls,
             request=original_request,
-            headers=json_response["headers"],
+            headers=headers,
             url=json_response["url"],
             body=resp_body,
             status=original_status or 200,
