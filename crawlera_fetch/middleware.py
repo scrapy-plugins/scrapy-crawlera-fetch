@@ -256,6 +256,7 @@ class CrawleraFetchMiddleware:
         except (binascii.Error, ValueError):
             resp_body = json_response["body"]
         headers = Headers({x["name"]: x["value"] for x in json_response["headers"]})
+        del response.headers["Content-Encoding"]
         respcls = responsetypes.from_args(
             headers=headers,
             url=json_response["url"],
