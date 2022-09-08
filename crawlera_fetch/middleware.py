@@ -69,8 +69,8 @@ class CrawleraFetchMiddleware:
         self.apipass = settings.get("CRAWLERA_FETCH_APIPASS", "")
         self.auth_header = basic_auth_header(self.apikey, self.apipass)
 
-        if settings.get("CRAWLERA_FETCH_URL"):
-            self.url = settings["CRAWLERA_FETCH_URL"]
+        if url := getattr(spider, "crawlera_fetch_url", settings.get("CRAWLERA_FETCH_URL")):
+            self.url = url
 
         self.download_slot_policy = settings.get(
             "CRAWLERA_FETCH_DOWNLOAD_SLOT_POLICY", DownloadSlotPolicy.Domain
