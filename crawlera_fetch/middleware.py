@@ -60,13 +60,14 @@ class CrawleraFetchMiddleware:
 
     def _read_settings(self, spider: Spider) -> None:
         settings = spider.crawler.settings
-        if not settings.get("CRAWLERA_FETCH_APIKEY"):
+        apikey = getattr(spider, "crawlera_fetch_apikey", settings.get("CRAWLERA_FETCH_APIKEY"))
+        if not apikey:
             self.enabled = False
             logger.info("Crawlera Fetch API cannot be used without an apikey")
             return
 
-        self.apikey = settings["CRAWLERA_FETCH_APIKEY"]
-        self.apipass = settings.get("CRAWLERA_FETCH_APIPASS", "")
+        self.apikey = apikey
+        self.apipass = getattr(spider, "crawlera_fetch_apipass", settings.get("CRAWLERA_FETCH_APIPASS", ""))
         self.auth_header = basic_auth_header(self.apikey, self.apipass)
 
         if url := getattr(spider, "crawlera_fetch_url", settings.get("CRAWLERA_FETCH_URL")):
