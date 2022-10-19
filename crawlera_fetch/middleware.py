@@ -270,6 +270,7 @@ class CrawleraFetchMiddleware:
             url=json_response["url"],
             body=resp_body,
             status=original_status or 200,
+            encoding='utf-8'  # Need to test more
         )
 
     def _set_download_slot(self, request: Request, spider: Spider) -> None:
