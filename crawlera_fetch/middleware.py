@@ -131,9 +131,12 @@ class CrawleraFetchMiddleware:
         if shub_jobkey:
             self.default_args["job_id"] = shub_jobkey
 
+        body = {"url": request.url}
+
         # assemble JSON payload
         original_body_text = request.body.decode(request.encoding)
-        body = {"url": request.url, "body": original_body_text}
+        if original_body_text:
+            body["body"] = original_body_text
         if request.method != "GET":
             body["method"] = request.method
         body.update(self.default_args)
