@@ -16,7 +16,8 @@ from scrapy.settings import BaseSettings
 from scrapy.http import Headers
 from scrapy.spiders import Spider
 from scrapy.statscollectors import StatsCollector
-from scrapy.utils.reqser import request_from_dict, request_to_dict
+from scrapy.utils.request import request_from_dict
+from scrapy.http.request import request_to_dict
 from w3lib.http import basic_auth_header
 
 
