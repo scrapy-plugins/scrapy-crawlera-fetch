@@ -17,7 +17,6 @@ from scrapy.http import Headers
 from scrapy.spiders import Spider
 from scrapy.statscollectors import StatsCollector
 from scrapy.utils.request import request_from_dict
-from scrapy.http.request import request_to_dict
 from w3lib.http import basic_auth_header
 
 
@@ -145,7 +144,7 @@ class CrawleraFetchMiddleware:
         body_json = json.dumps(body)
 
         additional_meta = {
-            "original_request": request_to_dict(request, spider=spider),
+            "original_request": request.to_dict(),
             "timing": {"start_ts": time.time()},
         }
         crawlera_meta.update(additional_meta)
