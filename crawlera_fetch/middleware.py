@@ -257,7 +257,7 @@ class CrawleraFetchMiddleware:
         }
         try:
             resp_body = base64.b64decode(json_response["body"], validate=True)
-        except (binascii.Error, ValueError, TypeError):
+        except (binascii.Error, ValueError, TypeError, KeyError):
             resp_body = json_response["body"]
         if isinstance(json_response["headers"], dict):
             headers = Headers(json_response["headers"])
